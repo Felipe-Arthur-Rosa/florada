@@ -1,10 +1,9 @@
-import { FiltroStatus } from "./filtroStatus";
 import Input from "./input";
 
 export function FormPedido() {
     return (
-        <div className="grid-cols-2 max-w-4xl mx-auto">
-            <form className="flex-1 columns-1 border-collapse border border-gray-300 rounded-lg p-4 shadow-md">
+        <div className="grid grid-cols-2 gap-3 max-w-6xl mx-auto">
+            <form className="flex-1 border-collapse border border-gray-300 rounded-lg p-4 shadow-md">
                 <Input label="Nome do Cliente" name="nomeCliente" aria-required type="text" />
                 <Input label="Telefone" name="telefone" aria-required type="tel" />
                 <Input label="Bairro" name="bairro" type="text" />
@@ -23,7 +22,7 @@ export function FormPedido() {
                 </div>
                 <Input label="Valor final" name="valorFinal" readOnly />
                 <h1 className="text-sm font-semibold">Status</h1>
-                <FiltroStatus />
+
                 <div className="grid grid-cols-2 gap-3 mt-3">
                     <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" type="submit">Cancelar</button>
                     <button className=" bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded" type="submit">Criar Pedido</button>

@@ -1,4 +1,4 @@
-import { FormPedido } from "./_components/criarPedido";
+import { FormPedido } from "../_components/criarPedido";
 
 export default function CriarPedido() {
     return (
