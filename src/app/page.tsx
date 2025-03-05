@@ -2,7 +2,6 @@
 
 import GetPedidos from "@/actions/pedido-get";
 import { BarraDeBusca } from "./_components/barraDeBusca";
-// import { FormPedido } from "./_components/criarPedido";
 import { Pedidos } from "./_components/pedidos";
 import { useEffect, useState } from "react";
 
@@ -21,7 +20,7 @@ export type Produto = {
   valor: number,
 }
 
-export type status = {
+export type Status = {
   nome: string
 }
 
@@ -34,7 +33,7 @@ export type Pedido = {
   metodoPagamento: string,
   produtos: Produto[],
   valorFinal: number,
-  status: status,
+  status: Status,
   entregador: string | null,
 };
 
@@ -43,14 +42,14 @@ export default function Home() {
 
   useEffect(() => {
     GetPedidos().then((pedidos) => setPedidos(pedidos));
-    console.log("mudou", pedidos);
   },
     [setPedidos]);
 
-  return (
 
+
+  return (
     <div className="flex flex-col justify-center mx-10">
-      <BarraDeBusca pedidos = {pedidos} setPedidos={setPedidos} />
+      <BarraDeBusca pedidos={pedidos} setPedidos={setPedidos} />
       <Pedidos pedidos={pedidos} />
     </div>
   );

@@ -2,142 +2,141 @@
 
 import { Pedido } from "../page";
 import Input from "./input";
-import { X } from "lucide-react";
-
-// preciso de ajuda para fazer com que o resumo do pedido passe a ser um possivel componente e para fazer um set pedido
-const statusOptions = ["ativo", "concluido", "Cancelado"];
-
-function RemoveProduto(id: number) {
-    return (
-        console.log(pedido.produtos.filter(produto => produto.id !== id))
-    );
-}
-
-const pedido: Pedido =
-{
-    nomeCliente: "Reginaldo Correia dos Santos",
-    destinatario: "Reginaldo",
-    mensagem: "Feliz aniversário",
-    telefone: "999999999",
-    endereco: {
-        rua: "Rua dos Bobos",
-        numero: "0",
-        bairro: "Bairro",
-        cidade: "Cidade",
-        complemento: "Complemento",
-        dataHoraEntrega: "Data e hora de entrega"
-    },
-    metodoPagamento: "Dinheiro",
-    produtos: [
-        {
-            id: 1,
-            nome: "Produto 2",
-            valor: 10.00
-        },
-        {
-            id: 2,
-            nome: "Produto 2",
-            valor: 20.00
-        },
-        {
-            id: 3,
-            nome: "Produto 3",
-            valor: 30.00
-        }
-    ],
-    valorFinal: 60.00,
-    status: {
-        nome: "ativo"
-    },
-    entregador: "Entregador"
-};
+import pedidoPost from "@/actions/pedido-post";
+import { useState } from "react";
+import ResumoPedido from "./resumoPedido";
+import { status } from "@/actions/status-get";
 
 
 export function FormPedido() {
+
+    const [pedido, setPedido] = useState<Pedido>({
+        nomeCliente: "",
+        destinatario: "",
+        mensagem: "",
+        telefone: "",
+        endereco: {
+            rua: "",
+            numero: "",
+            bairro: "",
+            cidade: "",
+            complemento: "",
+            dataHoraEntrega: ""
+        },
+        metodoPagamento: "",
+        produtos: [],
+        valorFinal: 0,
+        status: { nome: "ativo" },
+        entregador: ""
+    });
+
+    function AlimentaProdutos() {
+        const produto = document.querySelector('input[name="produto"]') as HTMLInputElement;
+        const valor = document.querySelector('input[name="valor"]') as HTMLInputElement;
+
+        if (produto && valor) {
+            const novoProduto = {
+                id: pedido.produtos.length + 1,
+                nome: produto.value,
+                valor: parseFloat(valor.value) || 0
+            };
+
+            setPedido((prev) => {
+                const novosProdutos = [...prev.produtos, novoProduto];
+                const novoValorFinal = novosProdutos.reduce((total, p) => total + p.valor, 0); // Soma todos os valores
+                const valorfinal = document.querySelector('input[name="valorFinal"]') as HTMLInputElement;
+                valorfinal.value = "R$ " + novoValorFinal.toString(); // Atualiza o campo valorFinal
+                return {
+                    ...prev,
+                    produtos: novosProdutos,
+                    valorFinal: novoValorFinal // Atualiza o campo valorFinal
+                };
+            });
+
+            // Limpa os inputs após adicionar o produto
+            produto.value = "";
+            valor.value = "";
+        }
+    }
+
+    function AlimentaPedido(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+        const { name, value } = e.target;
+        console.log(name, value)
+        // Se for um campo dentro de 'status'
+        if (name === "status") {
+            console.log("Entou no status")
+            setPedido((prev) => ({
+                ...prev,
+                status: { nome: value }
+            }));
+            // Se for um campo dentro de 'endereco'
+        } else if (["rua", "numero", "bairro", "cidade", "complemento", "dataHoraEntrega"].includes(name)) {
+            setPedido((prev) => ({
+                ...prev,
+                endereco: { ...prev.endereco, [name]: value }
+            }));
+        } else {
+            // Para outros campos normais
+            setPedido((prev) => ({
+                ...prev,
+                [name]: value
+            }));
+        }
+    }
+
+    function CriaPedido(e: React.FormEvent) {
+        e.preventDefault(); // Impede o recarregamento da página
+        pedidoPost(pedido);
+    }
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-6xl mx-auto mt-4">
-            <form className="flex flex-col border-collapse border border-gray-300 rounded-lg p-4 shadow-md">
-                <Input label="Nome do Cliente" name="nomeCliente" aria-required type="text" />
-                <Input label="Telefone" name="telefone" aria-required type="tel" />
-                <Input label="Bairro" name="bairro" type="text" />
-                <Input label="Rua" name="rua" type="text" />
-                <Input label="Número" name="numero" type="number" />
-                <Input label="Cidade" name="cidade" type="text" />
-                <Input label="Complemento" name="complemento" type="text" />
-                <Input label="Quem irá receber" name="destinatario" type="text" />
-                <Input label="Data de entrega (Opcional)" name="dataHoraEntrega" type="text" />
-                <Input label="Mensagem do cartão" name="mensagem" type="text" />
-                <Input label="Metodo de Pagamento" name="metodoPagamento" type="text" />
+            <form onSubmit={CriaPedido} className="flex flex-col border-collapse border border-gray-300 rounded-lg p-4 shadow-md">
+                <Input label="Nome do Cliente" name="nomeCliente" aria-required type="text" onChange={AlimentaPedido} />
+                <Input label="Destinatario" name="destinatario" type="text" onChange={AlimentaPedido} />
+                <Input label="Telefone" name="telefone" aria-required type="tel" onChange={AlimentaPedido} />
+                <Input label="Bairro" name="bairro" type="text" onChange={AlimentaPedido} />
+                <Input label="Rua" name="rua" type="text" onChange={AlimentaPedido} />
+                <Input label="Número" name="numero" type="number" onChange={AlimentaPedido} />
+                <Input label="Cidade" name="cidade" type="text" onChange={AlimentaPedido} />
+                <Input label="Complemento" name="complemento" type="text" onChange={AlimentaPedido} />
+                <Input label="Data de entrega (Opcional)" name="dataHoraEntrega" type="text" onChange={AlimentaPedido} />
+                <Input label="Mensagem do cartão" name="mensagem" type="text" onChange={AlimentaPedido} />
+                <Input label="Metodo de Pagamento" name="metodoPagamento" type="text" onChange={AlimentaPedido} />
+
+                {/* Adiciona produtos */}
                 <div className="grid grid-cols-2 gap-3">
                     <Input label="Produto" name="produto" type="text" className="col-span-1" />
                     <div className="grid grid-cols-2 gap-3 col-span-1">
                         <Input label="Valor" name="valor" type="number" />
-                        <button className="bg-purple-500 hover:bg-purple-700 text-white font-bold rounded h-12 w-12 mt-4" type="submit">+</button>
+                        <button type="button" className="bg-purple-500 hover:bg-purple-700 text-white font-bold rounded h-12 w-12 mt-4" onClick={AlimentaProdutos}>+</button>
                     </div>
                 </div>
-                <Input label="Valor final" name="valorFinal" readOnly />
+
+                <Input label="Valor final" name="valorFinal" readOnly onChange={AlimentaPedido} />
+                
+                {/* Status */}
                 <h1 className="text-sm font-semibold">Status</h1>
                 <select
+                    name="status"
+                    onChange={AlimentaPedido}
+                    value={pedido.status.nome}
                     className="border border-gray-300 rounded-lg p-2 text-sm cursor-pointer shadow-sm"
                 >
                     <option value="">Status</option>
-                    {statusOptions.map((status, index) => (
-                        <option key={index} value={status.toLowerCase().replace(" ", "_")}>{status}</option>
+                    {status.map((status, index) => (
+                        <option key={index} value={status.nome}>{status.nome}</option>
                     ))}
                 </select>
-
+                
+                {/* Botões */}
                 <div className="grid grid-cols-2 gap-3 mt-3">
-                    <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" type="submit">Cancelar</button>
+                    <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Cancelar</button>
                     <button className=" bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded" type="submit">Criar Pedido</button>
                 </div>
+
             </form>
-            <div className="flex flex-col border border-gray-300 rounded-lg p-4 shadow-md">
-                <h1 className="text-lg font-semibold mb-3">Resumo do Pedido</h1>
-                <div className="grid grid-cols-2 gap-3">
-                    <p>Nome do Cliente: </p>
-                    <p>Reginaldo Correia dos Santos</p>
-                    <p>Telefone: </p>
-                    <p>Telefone</p>
-                    <p>Bairro: </p>
-                    <p>Bairro</p>
-                    <p>Rua: </p>
-                    <p>Rua</p>
-                    <p>Número: </p>
-                    <p>Número</p>
-                    <p>Cidade: </p>
-                    <p>Cidade</p>
-                    <p>Complemento: </p>
-                    <p>Complemento</p>
-                    <p>Quem irá receber: </p>
-                    <p>Quem irá receber</p>
-                    <p>Data de entrega (Opcional): </p>
-                    <p>Data de entrega</p>
-                    <p>Mensagem do cartão: </p>
-                    <p>Mensagem do cartão</p>
-                    <p>Metodo de Pagamento: </p>
-                    <p>Metodo de Pagamento</p>
-                    <p>Produtos </p>
-                    <p>Produto e Valor</p>
-                    <p>Valor final: </p>
-                    <p>Valor final</p>
-                    <p>Status: </p>
-                    <p>Status</p>
-                </div>
-                <div className="gap-3 p-2 mt-10 border-collapse border rounded-lg border-gray-300">
-                    <h1 className="text-lg font-semibold">Produtos</h1>
-                    <div className="flex flex-col gap-2 ">
-                        {pedido.produtos.map((produto) => (
-                            <div key={produto.id} className="flex items-center justify-between mb-2">
-                                <a className="truncate w-1/2">{produto.nome}</a>
-                                <a>{"R$ " + produto.valor}</a>
-                                <button className="bg-red-500 hover:bg-red-700 text-white font-bold rounded w-10 h-10 flex items-center justify-center" onClick={() => RemoveProduto(produto.id)}>
-                                    <X className="flex items-center justify-center text-white w-5 h-5" />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
+            <ResumoPedido pedido={pedido} setPedido={setPedido} />
         </div>
     );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import GetStatus from "@/actions/status-get";
 import { Pedido } from "../page";
 
 export type PedidosProps = {
@@ -9,6 +10,7 @@ export type PedidosProps = {
 const Pedidos: React.FC<PedidosProps> =  ({ pedidos }) => {
 
     return (
+        GetStatus(),
         <div>
             <h2 className="text-lg font-semibold mb-1">Pedidos</h2>
             <div className="grid grid-cols-1 gap-3 p-2 lg:grid-cols-4 ">
