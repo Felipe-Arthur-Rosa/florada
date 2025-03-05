@@ -16,6 +16,7 @@ export type Endereco = {
 };
 
 export type Produto = {
+  id: number,
   nome: string,
   valor: number,
 }
@@ -31,10 +32,10 @@ export type Pedido = {
   telefone: string,
   endereco: Endereco,
   metodoPagamento: string,
-  produtos: [Produto],
+  produtos: Produto[],
   valorFinal: number,
   status: status,
-  entregador: string
+  entregador: string | null,
 };
 
 export default function Home() {
@@ -48,7 +49,7 @@ export default function Home() {
 
   return (
 
-    <div className="max-w-6xl flex flex-col justify-center mx-auto">
+    <div className="flex flex-col justify-center mx-10">
       <BarraDeBusca pedidos = {pedidos} setPedidos={setPedidos} />
       <Pedidos pedidos={pedidos} />
     </div>

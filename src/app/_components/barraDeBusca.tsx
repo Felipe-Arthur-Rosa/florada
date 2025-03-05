@@ -9,6 +9,8 @@ export type PedidosProps = {
     setPedidos: React.Dispatch<React.SetStateAction<Pedido[]>>;
 };
 
+// BUG: a barra de busca não esta levando em consideração o status caso ele ja esteja selecionado não da para pas
+
 const filtroStatus = (search: string, pedidos: Pedido[], setPedidos: React.Dispatch<React.SetStateAction<Pedido[]>>) => {
     return function (event: React.ChangeEvent<HTMLSelectElement>) {
         const status = event.target.value;
@@ -17,7 +19,8 @@ const filtroStatus = (search: string, pedidos: Pedido[], setPedidos: React.Dispa
                 if (search === "" && status !== "") {
                     return pedido.status.nome === status;
                 } else if (search !== "" && status !== "") {
-                    return (pedido.status.nome === status && pedido.nomeCliente.toLowerCase().includes(search.toLowerCase()));
+                    return (pedido.nomeCliente.toLowerCase().includes(search.toLowerCase()) || 
+                    pedido.telefone.includes(search.toLowerCase()) && pedido.status.nome === status );
                 } 
                 return pedido;
             }));
@@ -35,9 +38,10 @@ function FiltroDeBusca(setSearch: React.Dispatch<React.SetStateAction<string>>, 
                 setPedidos(pedidos);
             });
         } else {
-            GetPedidos().then(pedidos => {
-                setPedidos(pedidos.filter((pedido: Pedido) => pedido.nomeCliente.toLowerCase().includes(busca.toLowerCase())));
-            });
+            GetPedidos().then(pedidos => 
+                setPedidos(pedidos.filter((pedido: Pedido) => pedido.nomeCliente.toLowerCase().includes(busca.toLowerCase()) || pedido.telefone.includes(busca) || 
+                pedido.endereco.rua.toLowerCase().includes(busca.toLowerCase()) || pedido.endereco.bairro.toLowerCase().includes(busca.toLowerCase())))
+            );
         }
     }
 }
@@ -47,7 +51,7 @@ const BarraDeBusca: React.FC<PedidosProps> = ({ pedidos, setPedidos }) => {
     const [search, setSearch] = useState<string>("");
 
     return (
-        <div className="items-center mb-4 mt-16 p-6">
+        <div className="items-center ml-32 mb-4 mt-16">
             <input
                 type="text"
                 placeholder="Buscar"

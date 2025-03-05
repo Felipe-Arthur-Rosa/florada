@@ -13,9 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="flex justify-center">
+    <html lang="en" className="">
       <body>
-        <div className="container bg-white p-7 min-w-full w-svw min-h-max h-svh">
           <header className="bg-white text-black p-4 flex justify-between items-center shadow-md top-0 left-0 z-50">
             <Link className="hover:scale-110 duration-150" href={'/'}>Florada</Link>
             <div className="flex gap-4">
@@ -25,7 +24,6 @@ export default function RootLayout({
             </div>
           </header>
           {children}
-        </div>
       </body>
     </html>
   );
