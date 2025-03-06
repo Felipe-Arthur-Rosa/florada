@@ -4,7 +4,6 @@ import GetPedidos from "../actions/pedido-get";
 import { BarraDeBusca } from "./_components/barraDeBusca";
 import { Pedidos } from "./_components/pedidos";
 import { useEffect, useState } from "react";
-import GetStatus from "../actions/status-get";
 import { ModalProvider } from "@/components/modalProvider";
 import { PedidoModal } from "@/components/modal";
 
@@ -52,7 +51,6 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    GetStatus(),
     <ModalProvider>
       <div className="flex flex-col justify-center mx-10">
         <BarraDeBusca pedidos={pedidos} setPedidos={setPedidos} />

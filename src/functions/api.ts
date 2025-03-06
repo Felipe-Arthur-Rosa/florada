@@ -10,9 +10,3 @@ export function PEDIDO_URL (id : string = '') {
         url: `${API_URL}/pedido/${id}`,
     }   
 }
-
-export function STATUS_URL () {
-    return {
-        url: `${API_URL}/status`,
-        }    
-}
