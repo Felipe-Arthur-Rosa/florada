@@ -1,51 +1,58 @@
-import { status } from "@/actions/status-get";
-import Input from "@/app/_components/input";
-import { Pedido, Status } from "@/app/page";
+import { status } from "../actions/status-get";
+import Input from "../app/_components/input";
+import { Pedido } from "../app/page";
 import React from "react";
 
 interface ModalProps {
     isOpen: boolean;
-    pedido: Pedido;
-    statusOptions: Status[];
+    pedido: Pedido|null;
     onClose: () => void;
 }
 
-export default async function PedidoModal({ isOpen, pedido, onClose }: ModalProps) {
+const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose }) => {
     
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50" style={{ display: isOpen ? "flex" : "none" }} 
+        onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+            if (e.target === e.currentTarget) {
+                onClose();
+            }
+        }}>
             <div className="bg-white p-4 rounded shadow-md w-80">
                 <h2 className="font-bold text-xl mb-2">Detalhes do Pedido</h2>
-                <p>Cliente: {pedido.nomeCliente}</p>
+
+                  
+                <p>Cliente: {pedido?.nomeCliente}</p>
                 
-                {pedido.destinatario?<p>Destinatario: {pedido.destinatario}</p> : null} 
+                {pedido?.destinatario? <p>Destinatario: {pedido?.destinatario}</p> : null} 
                 
-                <p>Telefone: {pedido.telefone}</p>
+                <p>Telefone: {pedido?.telefone}</p>
 
                 {pedido?.endereco ? 
                     <p><strong>Endereço:</strong> {pedido.endereco.rua}, {pedido.endereco.bairro}, {pedido.endereco.numero}, {pedido.endereco.cidade}</p>
                 : null}
 
-                {pedido.endereco.complemento ? 
-                <p>Complemento: {pedido.endereco.complemento}</p> 
+                {pedido?.endereco.complemento ? 
+                <p>Complemento: {pedido?.endereco.complemento}</p> 
                 : null}
 
-                {pedido.endereco.dataHoraEntrega ?
-                <p>Data e Hora de Entrega: {pedido.endereco.dataHoraEntrega}</p> 
+                {pedido?.endereco.dataHoraEntrega ?
+                <p>Data e Hora de Entrega: {pedido?.endereco.dataHoraEntrega}</p> 
                 : null}
 
-                {pedido.mensagem ? <p>Mensagem: {pedido.mensagem} </p> : null}
+                {pedido?.mensagem ? <p>Mensagem: {pedido?.mensagem} </p> : null}
 
-                <p>Método de Pagamento: {pedido.metodoPagamento}</p>
+                <p>Método de Pagamento: {pedido?.metodoPagamento}</p>
 
                 <p>Produtos:</p>
                 <ul>
-                    {pedido.produtos.map((produto, index) => (
+                    {pedido?.produtos.map((produto, index) => (
                         <li key={index}>{produto.nome} - R$ {produto.valor}</li>
                     ))}
-                    <p>Valor Final: R$ {pedido.valorFinal}</p>
+                    <p>Valor Final: R$ {pedido?.valorFinal}</p>
                 </ul>
                 <select
                     className="border border-gray-300 rounded-lg p-2 text-sm cursor-pointer shadow-sm"
@@ -70,5 +77,7 @@ export default async function PedidoModal({ isOpen, pedido, onClose }: ModalProp
                 </button>
             </div>
         </div>
-    );
+    ); 
 }
+
+export { PedidoModal };

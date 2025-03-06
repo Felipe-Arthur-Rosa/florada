@@ -1,4 +1,4 @@
-import { Status } from '@/app/page';
+import { Status } from "../app/page";
 import { STATUS_URL } from '../functions/api';
 
 export let status : Status[] = [];

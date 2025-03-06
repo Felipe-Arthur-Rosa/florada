@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pedido } from "../page";
-import GetPedidos from "@/actions/pedido-get";
-import { status } from "@/actions/status-get";
+import GetPedidos from "../../actions/pedido-get";
+import { status } from "../../actions/status-get";
 
 export type PedidosProps = {
     pedidos: Pedido[];

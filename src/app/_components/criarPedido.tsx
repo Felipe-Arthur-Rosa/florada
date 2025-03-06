@@ -2,10 +2,10 @@
 
 import { Pedido } from "../page";
 import Input from "./input";
-import pedidoPost from "@/actions/pedido-post";
+import pedidoPost from "../../actions/pedido-post";
 import { useState } from "react";
 import ResumoPedido from "./resumoPedido";
-import { status } from "@/actions/status-get";
+import { status } from "../../actions/status-get";
 
 
 export function FormPedido() {

@@ -1,4 +1,4 @@
-import { Pedido } from '@/app/page';
+import { Pedido } from "../app/page";
 import { PEDIDO_URL } from '../functions/api';
 
 export default async function pedidoPost(pedido: Pedido) {

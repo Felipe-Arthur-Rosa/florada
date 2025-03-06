@@ -1,5 +1,5 @@
 'use client';
-import GetPedidos from "@/actions/pedido-get";
+import GetPedidos from "../../actions/pedido-get";
 import { Pedido } from "../page";
 
 const statusOptions = ["ativo", "concluido", "Cancelado"];

@@ -1,10 +1,12 @@
 'use client';
 
-import GetPedidos from "@/actions/pedido-get";
+import GetPedidos from "../actions/pedido-get";
 import { BarraDeBusca } from "./_components/barraDeBusca";
 import { Pedidos } from "./_components/pedidos";
 import { useEffect, useState } from "react";
-import GetStatus from "@/actions/status-get";
+import GetStatus from "../actions/status-get";
+import { ModalProvider } from "@/components/modalProvider";
+import { PedidoModal } from "@/components/modal";
 
 export type Endereco = {
   rua: string,
@@ -40,19 +42,23 @@ export type Pedido = {
 
 export default function Home() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [pedido, setPedido] = useState<Pedido|null>(null);
 
   useEffect(() => {
     GetPedidos().then((pedidos) => setPedidos(pedidos));
   },
     [setPedidos]);
 
-
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     GetStatus(),
-    <div className="flex flex-col justify-center mx-10">
-      <BarraDeBusca pedidos={pedidos} setPedidos={setPedidos} />
-      <Pedidos pedidos={pedidos} />
-    </div>
+    <ModalProvider>
+      <div className="flex flex-col justify-center mx-10">
+        <BarraDeBusca pedidos={pedidos} setPedidos={setPedidos} />
+        <Pedidos pedidos={pedidos} SetPedido={setPedido} setIsOpen={setIsOpen} isOpen={isOpen} />
+        <PedidoModal isOpen={isOpen} pedido={pedido} onClose={() => {setIsOpen(!isOpen)}}/>
+      </div>
+    </ModalProvider>
   );
 }
