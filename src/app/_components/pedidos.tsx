@@ -12,6 +12,7 @@ export type PedidosProps = {
 function AbreModal(pedido: Pedido, setPedido: React.Dispatch<React.SetStateAction<Pedido | null>>, setIsOpen: React.Dispatch<React.SetStateAction<boolean>>, isOpen: boolean) {
     
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return function (_e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
         setPedido(pedido);
         setIsOpen(!isOpen);
