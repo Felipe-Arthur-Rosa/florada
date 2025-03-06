@@ -44,7 +44,7 @@ export default function ResumoPedido({ pedido, setPedido }: ResumoPedidoProps) {
                 <p>Status: </p>
                 {pedido.status.nome ? <p>{pedido.status.nome}</p> : <p></p>}
             </div>
-            <div className="gap-3 p-2 mt-10 border-collapse border rounded-lg border-gray-300">
+            <div className="pl-6 list-disc max-h-60 overflow-y-auto border border-gray-300 rounded p-2 mt-2">
                 <h1 className="text-lg font-semibold">Produtos</h1>
                 <div className="flex flex-col gap-2 ">
                     {pedido.produtos.map((produto) => (

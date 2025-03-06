@@ -27,6 +27,7 @@ export type Status = {
 }
 
 export type Pedido = {
+  _id: string,
   nomeCliente: string,
   destinatario: string,
   mensagem: string,
@@ -43,10 +44,15 @@ export default function Home() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [pedido, setPedido] = useState<Pedido|null>(null);
 
+  const recarregarPedidos = () => {
+    GetPedidos().then((pedidos) => setPedidos(pedidos));
+  }
+
   useEffect(() => {
     GetPedidos().then((pedidos) => setPedidos(pedidos));
   },
     [setPedidos]);
+
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -55,7 +61,7 @@ export default function Home() {
       <div className="flex flex-col justify-center mx-10">
         <BarraDeBusca pedidos={pedidos} setPedidos={setPedidos} />
         <Pedidos pedidos={pedidos} SetPedido={setPedido} setIsOpen={setIsOpen} isOpen={isOpen} />
-        <PedidoModal isOpen={isOpen} pedido={pedido} onClose={() => {setIsOpen(!isOpen)}}/>
+        <PedidoModal isOpen={isOpen} pedido={pedido} onPedidoAlterado={() => { recarregarPedidos() }} onClose={() => {setIsOpen(!isOpen);}} />
       </div>
     </ModalProvider>
   );

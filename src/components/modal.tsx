@@ -1,83 +1,125 @@
+import PedidoPut from "@/actions/pedido-put";
 import { status } from "../actions/status-get";
 import Input from "../app/_components/input";
 import { Pedido } from "../app/page";
 import React from "react";
+import DeletePedido from "@/actions/pedido-delete";
 
 interface ModalProps {
     isOpen: boolean;
-    pedido: Pedido|null;
+    pedido: Pedido | null;
     onClose: () => void;
+    onPedidoAlterado: () => void;
 }
 
-const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose }) => {
-    
+const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAlterado }) => {
+
     if (!isOpen) return null;
+
+    function ExcluirPedido() {
+        if(pedido) {
+            DeletePedido(pedido._id).then(() => {
+                onClose();
+                onPedidoAlterado();
+            });
+    }}
+
+    function AtualizarPedido() {
+        if (pedido) {
+            const statusSelect = document.querySelector('select[name="status"]') as HTMLSelectElement;
+            const entregadorInput = document.querySelector('input[name="entregador"]') as HTMLInputElement;
+
+            const statusSelecionado = statusSelect?.value || pedido.status.nome;
+            const entregadorSelecionado = entregadorInput?.value || pedido.entregador;
+
+            const pedidoAtualizado: Pedido = {
+                ...pedido,
+                status: { nome: statusSelecionado },
+                entregador: entregadorSelecionado
+            };
+
+            PedidoPut(pedidoAtualizado);
+            onPedidoAlterado();
+            onClose();
+        }
+    }
+
 
     return (
 
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50" style={{ display: isOpen ? "flex" : "none" }} 
-        onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-            if (e.target === e.currentTarget) {
-                onClose();
-            }
-        }}>
-            <div className="bg-white p-4 rounded shadow-md w-80">
-                <h2 className="font-bold text-xl mb-2">Detalhes do Pedido</h2>
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-30" style={{ display: isOpen ? "flex" : "none" }}
+            onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+                if (e.target === e.currentTarget) {
+                    onClose();
+                }
+            }}>
+            <div className="bg-white p-4 rounded shadow-md w-1/4 border-collapse border-2 border-gray-300">
 
-                  
-                <p>Cliente: {pedido?.nomeCliente}</p>
-                
-                {pedido?.destinatario? <p>Destinatario: {pedido?.destinatario}</p> : null} 
-                
-                <p>Telefone: {pedido?.telefone}</p>
+                <h2 className="font-bold text-xl text-center mb-2">Detalhes do Pedido</h2>
 
-                {pedido?.endereco ? 
-                    <p><strong>Endereço:</strong> {pedido.endereco.rua}, {pedido.endereco.bairro}, {pedido.endereco.numero}, {pedido.endereco.cidade}</p>
-                : null}
+                <div className="pl-4">
+                    <p className="mt-2" >Cliente: {pedido?.nomeCliente}</p>
 
-                {pedido?.endereco.complemento ? 
-                <p>Complemento: {pedido?.endereco.complemento}</p> 
-                : null}
+                    {pedido?.destinatario ? <p className="mt-2">Destinatario: {pedido?.destinatario}</p> : null}
 
-                {pedido?.endereco.dataHoraEntrega ?
-                <p>Data e Hora de Entrega: {pedido?.endereco.dataHoraEntrega}</p> 
-                : null}
+                    <p className="mt-2">Telefone: {pedido?.telefone}</p>
 
-                {pedido?.mensagem ? <p>Mensagem: {pedido?.mensagem} </p> : null}
+                    {pedido?.endereco ?
+                        <p className="mt-2">Endereço: Rua {pedido.endereco.rua}, {pedido.endereco.bairro}, {pedido.endereco.numero}, {pedido.endereco.cidade}</p>
+                        : null}
 
-                <p>Método de Pagamento: {pedido?.metodoPagamento}</p>
+                    {pedido?.endereco.complemento ?
+                        <p className="mt-2">Complemento: {pedido?.endereco.complemento}</p>
+                        : null}
 
-                <p>Produtos:</p>
-                <ul>
-                    {pedido?.produtos.map((produto, index) => (
-                        <li key={index}>{produto.nome} - R$ {produto.valor}</li>
-                    ))}
-                    <p>Valor Final: R$ {pedido?.valorFinal}</p>
-                </ul>
-                <select
-                    className="border border-gray-300 rounded-lg p-2 text-sm cursor-pointer shadow-sm"
-                >
-                    <option value="">Status</option>
-                    {status.map((status, index) => (
-                        <option key={index} value={status.nome}>{status.nome}</option>
-                    ))}
-                </select>
-                <Input label="Mensagem do cartão" name="mensagem" type="text" />
-                <button
-                    // onClick={onClose}
-                    className="mt-4 px-4 py-2 bg-purple-500 hover:bg-purple-700 text-white rounded"
-                >
-                    Salvar
-                </button>
-                <button
-                    // onClick={}
-                    className="mt-4 px-4 py-2 bg-green-500 hover:bg-green-700 text-white rounded"
-                >
-                    Editar
-                </button>
+                    {pedido?.endereco.dataHoraEntrega ?
+                        <p className="mt-2">Data e Hora de Entrega: {pedido?.endereco.dataHoraEntrega}</p>
+                        : null}
+
+                    {pedido?.mensagem ? <p className="mt-2">Mensagem: {pedido?.mensagem} </p> : null}
+
+                    <p className="mt-2">Método de Pagamento: {pedido?.metodoPagamento}</p>
+
+                    {/* Lista de Produtos */}
+                    <p className="mt-2"><strong>Produtos:</strong></p>
+                    <div className="pl-6 list-disc max-h-40 overflow-y-auto border border-gray-300 rounded p-2">
+                        <ul>
+                            {pedido?.produtos?.map((produto, index) => (
+                                <li key={index}>{produto.nome} - R$ {produto.valor}</li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <p className="mt-2"><strong>Status</strong></p>
+                    <select
+                        defaultValue={pedido?.status?.nome || ""}
+                        className="border border-gray-300 rounded-lg p-2 text-sm cursor-pointer shadow-sm mb-3"
+                        name="status"
+                    >
+                        <option value="">Status</option>
+                        {status.map((status, index) => (
+                            <option key={index} value={status.nome}>{status.nome}</option>
+                        ))}
+                    </select>
+                    <Input label="Entregador" name="entregador" type="text" defaultValue={pedido?.entregador || ""} />
+                    <div className="flex justify-center mt-4 gap-16">
+                        <button
+                            onClick={() => pedido ? AtualizarPedido() : null}
+                            className="px-7 py-3 bg-green-500 hover:bg-green-700 text-white rounded"
+                        >
+                            Salvar
+                        </button>
+                        <button
+                            onClick={() => pedido ? ExcluirPedido() : null}
+                            className="px-7 py-3 bg-red-500 hover:bg-red-700 text-white rounded"
+                        >
+                            Excluir
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-    ); 
+    );
 }
 
 export { PedidoModal };

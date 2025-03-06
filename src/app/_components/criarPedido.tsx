@@ -6,11 +6,13 @@ import pedidoPost from "../../actions/pedido-post";
 import { useState } from "react";
 import ResumoPedido from "./resumoPedido";
 import { status } from "../../actions/status-get";
+import Link from "next/link";
 
 
 export function FormPedido() {
 
     const [pedido, setPedido] = useState<Pedido>({
+        id: "",
         nomeCliente: "",
         destinatario: "",
         mensagem: "",
@@ -130,8 +132,8 @@ export function FormPedido() {
                 </select>
                 
                 {/* Botões */}
-                <div className="grid grid-cols-2 gap-3 mt-3">
-                    <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Cancelar</button>
+                <div className="grid grid-cols-2 gap-7 mt-3">
+                    <Link className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded text-center" href={'/'}>Cancelar</Link>
                     <button className=" bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded" type="submit">Criar Pedido</button>
                 </div>
 

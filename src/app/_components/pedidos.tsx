@@ -14,6 +14,7 @@ function AbreModal(pedido: Pedido, setPedido: React.Dispatch<React.SetStateActio
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return function (_e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        console.log(pedido);
         setPedido(pedido);
         setIsOpen(!isOpen);
     }
