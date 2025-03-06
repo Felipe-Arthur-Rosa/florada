@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
+  "dev": "next dev",
+  "build": "next build",
+  "export": "next export",
+  "serve": "next start",
+  "deploy": "npm run build && npm run export && firebase deploy"
+},
   "dependencies": {
     "firebase": "^11.4.0",
     "lucide-react": "^0.477.0",
