@@ -4,6 +4,7 @@ import GetPedidos from "@/actions/pedido-get";
 import { BarraDeBusca } from "./_components/barraDeBusca";
 import { Pedidos } from "./_components/pedidos";
 import { useEffect, useState } from "react";
+import GetStatus from "@/actions/status-get";
 
 export type Endereco = {
   rua: string,
@@ -48,6 +49,7 @@ export default function Home() {
 
 
   return (
+    GetStatus(),
     <div className="flex flex-col justify-center mx-10">
       <BarraDeBusca pedidos={pedidos} setPedidos={setPedidos} />
       <Pedidos pedidos={pedidos} />

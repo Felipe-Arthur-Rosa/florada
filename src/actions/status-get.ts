@@ -6,7 +6,6 @@ export let status : Status[] = [];
 async function GetStatus() {
     const url = STATUS_URL().url;
     status = await(await fetch(url)).json();
-    console.log("buscou status:" + status);
 }
 
 export default GetStatus;
