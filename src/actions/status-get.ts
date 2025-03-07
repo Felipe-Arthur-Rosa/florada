@@ -23,7 +23,7 @@ export const status: Status[] = [
     nome: "Entregue",
   },
   {
-    nome: "Cancelado pelo CLiente",
+    nome: "Cancelado pelo Cliente",
   },
   {
     nome: "Cancelado por falta de Interação",
