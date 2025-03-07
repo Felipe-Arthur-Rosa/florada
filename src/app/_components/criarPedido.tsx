@@ -12,7 +12,7 @@ import Link from "next/link";
 export function FormPedido() {
 
     const [pedido, setPedido] = useState<Pedido>({
-        id: "",
+        _id: "",
         nomeCliente: "",
         destinatario: "",
         mensagem: "",

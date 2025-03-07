@@ -4,7 +4,6 @@ import { PEDIDO_URL } from '../functions/api';
 export default async function PedidoPut(pedido: Pedido) {
 
     const { url } = PEDIDO_URL(pedido._id);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const pedidoSemId = removerId(pedido);
 
     console.log(pedidoSemId);
@@ -25,7 +24,6 @@ export default async function PedidoPut(pedido: Pedido) {
 }
 
 // Função para remover _id de qualquer objeto
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const removerId = (obj: any): any => {
   if (Array.isArray(obj)) {
     return obj.map(removerId); // Se for um array, aplica recursivamente
