@@ -1,4 +1,4 @@
-export const API_URL = "api-florada.vercel.app";
+export const API_URL = "https://api-florada.vercel.app";
 
 export function PEDIDO_URL (id : string = '') {
     if(id === '') {
