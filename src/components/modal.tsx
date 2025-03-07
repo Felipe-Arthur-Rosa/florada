@@ -17,12 +17,13 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
     if (!isOpen) return null;
 
     function ExcluirPedido() {
-        if(pedido) {
+        if (pedido) {
             DeletePedido(pedido._id).then(() => {
                 onClose();
                 onPedidoAlterado();
             });
-    }}
+        }
+    }
 
     function AtualizarPedido() {
         if (pedido) {
@@ -76,9 +77,16 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
                         <p className="mt-2">Data e Hora de Entrega: {pedido?.endereco.dataHoraEntrega}</p>
                         : null}
 
-                    {pedido?.mensagem ? <p className="mt-2">Mensagem: {pedido?.mensagem} </p> : null}
-
                     <p className="mt-2">Método de Pagamento: {pedido?.metodoPagamento}</p>
+
+                    {pedido?.mensagem ?
+                        
+                        <div className="list-disc max-h-40 overflow-y-auto border mt-2 border-gray-300 rounded p-2">
+                            <p><strong>Mensagem:</strong></p>
+                            <p className="mt-2">{pedido?.mensagem} </p>
+                        </div> : null
+                    }
+
 
                     {/* Lista de Produtos */}
                     <p className="mt-2"><strong>Produtos:</strong></p>
