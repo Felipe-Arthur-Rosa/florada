@@ -54,7 +54,7 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
                     onClose();
                 }
             }}>
-            <div className="bg-white p-4 rounded shadow-md w-1/4 border-collapse border-2 border-gray-300">
+            <div className="bg-white p-4 rounded shadow-md lg:w-1/4 border-collapse border-2 border-gray-300">
 
                 <h2 className="font-bold text-xl text-center mb-2">Detalhes do Pedido</h2>
 
