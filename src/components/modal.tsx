@@ -54,7 +54,7 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
                     onClose();
                 }
             }}>
-            <div className="bg-white p-4 rounded shadow-md lg:w-1/4 border-collapse border-2 border-gray-300">
+            <div className="bg-white p-4 mt-10 mb-10 rounded shadow-md max-h-screen overflow-y-auto lg:w-1/4 border-collapse border-2 border-gray-300">
 
                 <h2 className="font-bold text-xl text-center mb-2">Detalhes do Pedido</h2>
 
@@ -69,11 +69,11 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
                         <p className="mt-2">Endereço: Rua {pedido.endereco.rua}, {pedido.endereco.bairro}, {pedido.endereco.numero}, {pedido.endereco.cidade}</p>
                         : null}
 
-                    {pedido?.endereco.complemento ?
+                    {pedido?.endereco?.complemento ?
                         <p className="mt-2">Complemento: {pedido?.endereco.complemento}</p>
                         : null}
 
-                    {pedido?.endereco.dataHoraEntrega ?
+                    {pedido?.endereco?.dataHoraEntrega ?
                         <p className="mt-2">Data e Hora de Entrega: {pedido?.endereco.dataHoraEntrega}</p>
                         : null}
 

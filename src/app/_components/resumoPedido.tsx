@@ -24,17 +24,17 @@ export default function ResumoPedido({ pedido, setPedido }: ResumoPedidoProps) {
                 <p>Telefone: </p>
                 {pedido.telefone ? <p>{pedido.telefone}</p> : <p></p>}
                 <p>Bairro: </p>
-                {pedido.endereco.bairro ? <p>{pedido.endereco.bairro}</p> : <p></p>}
+                {pedido.endereco?.bairro ? <p>{pedido.endereco.bairro}</p> : <p></p>}
                 <p>Rua: </p>
-                {pedido.endereco.rua ? <p>{pedido.endereco.rua}</p> : <p></p>}
+                {pedido.endereco?.rua ? <p>{pedido.endereco.rua}</p> : <p></p>}
                 <p>Número: </p>
-                {pedido.endereco.numero ? <p>{pedido.endereco.numero}</p> : <p></p>}
+                {pedido.endereco?.numero ? <p>{pedido.endereco.numero}</p> : <p></p>}
                 <p>Cidade: </p>
-                {pedido.endereco.cidade ? <p>{pedido.endereco.cidade}</p> : <p></p>}
+                {pedido.endereco?.cidade ? <p>{pedido.endereco.cidade}</p> : <p></p>}
                 <p>Complemento: </p>
-                {pedido.endereco.complemento ? <p>{pedido.endereco.complemento}</p> : <p></p>}
+                {pedido.endereco?.complemento ? <p>{pedido.endereco.complemento}</p> : <p></p>}
                 <p>Data de entrega (Opcional): </p>
-                {pedido.endereco.dataHoraEntrega ? <p>{pedido.endereco.dataHoraEntrega}</p> : <p></p>}
+                {pedido.endereco?.dataHoraEntrega ? <p>{pedido.endereco.dataHoraEntrega}</p> : <p></p>}
                 <p>Mensagem do cartão: </p>
                 {pedido.mensagem ? <p>{pedido.mensagem}</p> : <p></p>}
                 <p>Metodo de Pagamento: </p>

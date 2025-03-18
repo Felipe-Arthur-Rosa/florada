@@ -25,8 +25,8 @@ const filtro = (
                         busca === "" ||
                         pedido.nomeCliente.toLowerCase().includes(busca.toLowerCase()) ||
                         pedido.telefone.includes(busca) ||
-                        pedido.endereco.rua.toLowerCase().includes(busca.toLowerCase()) ||
-                        pedido.endereco.bairro.toLowerCase().includes(busca.toLowerCase());
+                        pedido.endereco?.rua.toLowerCase().includes(busca.toLowerCase()) ||
+                        pedido.endereco?.bairro.toLowerCase().includes(busca.toLowerCase());
 
                     const atendeStatus = status === "" || pedido.status.nome === status;
 

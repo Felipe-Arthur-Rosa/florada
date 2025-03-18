@@ -29,7 +29,10 @@ const Pedidos: React.FC<PedidosProps> = ({ pedidos, SetPedido, setIsOpen, isOpen
                     onClick={AbreModal(pedido, SetPedido, setIsOpen, isOpen)}>
                         <p className="font-bold">{pedido.nomeCliente}</p>
                         <p className="line-clamp-2 text-gray-700">Telefone: {pedido.telefone}</p>
-                        <p className="line-clamp-2 text-gray-700">Endereço: {pedido.endereco.rua}, {pedido.endereco.numero}, {pedido.endereco.bairro}</p>
+                        pedido.endereco ? 
+                        <p className="line-clamp-2 text-gray-700">Endereço: {pedido.endereco?.rua}, {pedido.endereco?.numero}, {pedido.endereco?.bairro}</p> 
+                        : null
+                        
                         <p className="text-gray-700">Status: {pedido.status.nome}</p>
                     </div>
                 ))}

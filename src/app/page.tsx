@@ -29,10 +29,10 @@ export type Status = {
 export type Pedido = {
   _id: string,
   nomeCliente: string,
-  destinatario: string,
+  destinatario: string | null,
   mensagem: string,
   telefone: string,
-  endereco: Endereco,
+  endereco: Endereco | null,
   metodoPagamento: string,
   produtos: Produto[],
   valorFinal: number,

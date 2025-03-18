@@ -63,28 +63,37 @@ export function FormPedido() {
 
     function AlimentaPedido(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
         const { name, value } = e.target;
-        console.log(name, value)
-        // Se for um campo dentro de 'status'
-        if (name === "status") {
-            console.log("Entou no status")
-            setPedido((prev) => ({
-                ...prev,
-                status: { nome: value }
-            }));
-            // Se for um campo dentro de 'endereco'
-        } else if (["rua", "numero", "bairro", "cidade", "complemento", "dataHoraEntrega"].includes(name)) {
-            setPedido((prev) => ({
-                ...prev,
-                endereco: { ...prev.endereco, [name]: value }
-            }));
-        } else {
+        console.log(name, value);
+
+        setPedido((prev) => {
+            // Se for um campo dentro de 'status'
+            if (name === "status") {
+                return {
+                    ...prev,
+                    status: { nome: value }
+                };
+            }
+
+            // Se for um campo dentro de 'endereco', só modifica se já existir
+            if (["rua", "numero", "bairro", "cidade", "complemento", "dataHoraEntrega"].includes(name)) {
+                if (!prev.endereco) {
+                    // Se endereco for null, não faz nada e retorna o estado atual
+                    return prev;
+                }
+                return {
+                    ...prev,
+                    endereco: { ...prev.endereco, [name]: value }
+                };
+            }
+
             // Para outros campos normais
-            setPedido((prev) => ({
+            return {
                 ...prev,
                 [name]: value
-            }));
-        }
+            };
+        });
     }
+
 
     function CriaPedido(e: React.FormEvent) {
         e.preventDefault(); // Impede o recarregamento da página
