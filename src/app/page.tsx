@@ -6,6 +6,7 @@ import { Pedidos } from "./_components/pedidos";
 import { useEffect, useState } from "react";
 import { ModalProvider } from "@/components/modalProvider";
 import { PedidoModal } from "@/components/modal";
+import { useRouter } from "next/navigation";
 
 export type Endereco = {
   rua: string,
@@ -41,17 +42,48 @@ export type Pedido = {
 };
 
 export default function Home() {
+  const router = useRouter();
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [pedido, setPedido] = useState<Pedido|null>(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isLoadingPedidos, setIsLoadingPedidos] = useState(true);
 
   const recarregarPedidos = () => {
-    GetPedidos().then((pedidos) => setPedidos(pedidos));
+    setIsLoadingPedidos(true);
+    GetPedidos()
+      .then((pedidos) => setPedidos(pedidos))
+      .finally(() => setIsLoadingPedidos(false));
   }
 
   useEffect(() => {
-    GetPedidos().then((pedidos) => setPedidos(pedidos));
+    setIsLoadingPedidos(true);
+    GetPedidos()
+      .then((pedidos) => setPedidos(pedidos))
+      .finally(() => setIsLoadingPedidos(false));
   },
     [setPedidos]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pedidoCriado = params.get("pedidoCriado") === "1";
+    const pedidoAtualizado = params.get("pedidoAtualizado") === "1";
+
+    if (pedidoCriado) {
+      setSuccessMessage("Pedido cadastrado com sucesso.");
+      setShowSuccessMessage(true);
+      return;
+    }
+
+    if (pedidoAtualizado) {
+      setSuccessMessage("Pedido atualizado com sucesso.");
+      setShowSuccessMessage(true);
+      return;
+    }
+
+    setShowSuccessMessage(false);
+    setSuccessMessage("");
+  }, []);
 
 
   const [isOpen, setIsOpen] = useState(false);
@@ -59,8 +91,25 @@ export default function Home() {
   return (
     <ModalProvider>
       <div className="flex flex-col justify-center mx-10">
+        {showSuccessMessage ? (
+          <div className="mt-6 rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-green-700">
+            <div className="flex items-start justify-between gap-4">
+              <p>{successMessage}</p>
+              <button
+                type="button"
+                className="rounded px-2 py-1 text-sm transition hover:bg-green-100"
+                onClick={() => {
+                  setShowSuccessMessage(false);
+                  router.replace("/");
+                }}
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        ) : null}
         <BarraDeBusca pedidos={pedidos} setPedidos={setPedidos} />
-        <Pedidos pedidos={pedidos} SetPedido={setPedido} setIsOpen={setIsOpen} isOpen={isOpen} />
+        <Pedidos pedidos={pedidos} isLoading={isLoadingPedidos} SetPedido={setPedido} setIsOpen={setIsOpen} isOpen={isOpen} />
         <PedidoModal isOpen={isOpen} pedido={pedido} onPedidoAlterado={() => { recarregarPedidos() }} onClose={() => {setIsOpen(!isOpen);}} />
       </div>
     </ModalProvider>

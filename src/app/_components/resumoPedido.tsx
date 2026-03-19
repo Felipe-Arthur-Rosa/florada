@@ -33,7 +33,7 @@ export default function ResumoPedido({ pedido, setPedido }: ResumoPedidoProps) {
                 {pedido.endereco?.cidade ? <p>{pedido.endereco.cidade}</p> : <p></p>}
                 <p>Complemento: </p>
                 {pedido.endereco?.complemento ? <p>{pedido.endereco.complemento}</p> : <p></p>}
-                <p>Data de entrega (Opcional): </p>
+                <p>Data de entrega: </p>
                 {pedido.endereco?.dataHoraEntrega ? <p>{pedido.endereco.dataHoraEntrega}</p> : <p></p>}
                 <p>Mensagem do cartão: </p>
                 {pedido.mensagem ? <p>{pedido.mensagem}</p> : <p></p>}

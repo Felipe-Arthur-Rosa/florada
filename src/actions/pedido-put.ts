@@ -1,26 +1,75 @@
 import { Pedido } from "../app/page";
 import { PEDIDO_URL } from '../functions/api';
+import { fetchApi } from "./fetch-api";
+
+export type PedidoPutResult = {
+  success: boolean;
+  statusCode: number | null;
+  message: string;
+  data?: unknown;
+};
+
+function normalizePedidoPayload(pedido: Pedido) {
+  const endereco = pedido.endereco
+    ? Object.fromEntries(
+        Object.entries(pedido.endereco).filter(([, value]) => value !== undefined && value !== null && value !== "")
+      )
+    : null;
+
+  return {
+    ...pedido,
+    endereco: endereco && Object.keys(endereco).length > 0 ? endereco : undefined,
+  };
+}
+
+function getErrorMessage(data: unknown) {
+  if (data && typeof data === "object" && "error" in data && typeof data.error === "string") {
+    return data.error;
+  }
+
+  if (data && typeof data === "object" && "message" in data && typeof data.message === "string") {
+    return data.message;
+  }
+
+  return "Nao foi possivel editar o pedido.";
+}
 
 export default async function PedidoPut(pedido: Pedido) {
+    try {
+      const { url } = PEDIDO_URL(pedido._id);
+      const pedidoSemId = removerId(normalizePedidoPayload(pedido));
+      const response = await fetchApi(url, {
+          method: "PUT",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify(pedidoSemId),
+      });
 
-    const { url } = PEDIDO_URL(pedido._id);
-    const pedidoSemId = removerId(pedido);
+      const data = await response.json().catch(() => null);
 
-    console.log(pedidoSemId);
+      if (!response.ok) {
+        return {
+          success: false,
+          statusCode: response.status,
+          message: getErrorMessage(data),
+          data,
+        } satisfies PedidoPutResult;
+      }
 
-    const response = await fetch(url, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(pedidoSemId),
-    });
-
-    if (!response.ok) {
-        throw new Error('Erro ao Editar pedido');
+      return {
+        success: true,
+        statusCode: response.status,
+        message: "Pedido atualizado com sucesso.",
+        data,
+      } satisfies PedidoPutResult;
+    } catch (error) {
+      return {
+        success: false,
+        statusCode: null,
+        message: error instanceof Error ? error.message : "Nao foi possivel editar o pedido.",
+      } satisfies PedidoPutResult;
     }
-
-    return response.json();
 }
 
 // Função para remover _id de qualquer objeto

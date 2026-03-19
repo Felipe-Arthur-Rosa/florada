@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Link from "next/link";
+import ApiStatusPopup from "@/components/apiStatusPopup";
 
 export const metadata: Metadata = {
   title: "Florada API",
@@ -15,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="">
       <body>
+          <ApiStatusPopup />
           <header className="bg-white text-black p-4 flex justify-between items-center shadow-md top-0 left-0 z-50">
             <Link className="hover:scale-110 duration-150" href={'/'}>Florada</Link>
             <div className="flex gap-4">

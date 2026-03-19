@@ -4,6 +4,7 @@ import { Pedido } from "../page";
 
 export type PedidosProps = {
     pedidos: Pedido[];
+    isLoading: boolean;
     SetPedido: React.Dispatch<React.SetStateAction<Pedido | null>>;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,26 +18,35 @@ function AbreModal(pedido: Pedido, setPedido: React.Dispatch<React.SetStateActio
     }
 }
 
-const Pedidos: React.FC<PedidosProps> = ({ pedidos, SetPedido, setIsOpen, isOpen }) => {
+const Pedidos: React.FC<PedidosProps> = ({ pedidos, isLoading, SetPedido, setIsOpen, isOpen }) => {
     return (
         <div>
             <h2 className="text-lg font-semibold mb-1">Pedidos</h2>
+            {isLoading ? (
+                <div className="rounded-lg border border-gray-300 bg-gray-50 p-6 text-center text-gray-600">
+                    Carregando pedidos...
+                </div>
+            ) : pedidos.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-6 text-center text-gray-600">
+                    Nenhum pedido foi criado ainda.
+                </div>
+            ) : (
             <div className="grid grid-cols-1 gap-3 p-2 lg:grid-cols-4 ">
-                {pedidos && pedidos.map((pedido, index) => (
+                {pedidos.map((pedido, index) => (
                     <div 
-                    className="bg-white p-4 rounded-lg shadow-md border border-gray-300  cursor-pointer hover:scale-110 duration-150 transition" 
+                    className="cursor-pointer rounded-lg border border-gray-300 bg-white p-4 shadow-md transition duration-150 hover:border-gray-500 hover:shadow-lg" 
                     key={index} 
                     onClick={AbreModal(pedido, SetPedido, setIsOpen, isOpen)}>
                         <p className="font-bold">{pedido.nomeCliente}</p>
                         <p className="line-clamp-2 text-gray-700">Telefone: {pedido.telefone}</p>
-                        pedido.endereco ? 
-                        <p className="line-clamp-2 text-gray-700">Endereço: {pedido.endereco?.rua}, {pedido.endereco?.numero}, {pedido.endereco?.bairro}</p> 
-                        : null
-                        
+                        {pedido.endereco ? (
+                            <p className="line-clamp-2 text-gray-700">Endereço: {pedido.endereco.rua}, {pedido.endereco.numero}, {pedido.endereco.bairro}</p>
+                        ) : null}
                         <p className="text-gray-700">Status: {pedido.status.nome}</p>
                     </div>
                 ))}
             </div>
+            )}
         </div>
     );
 }
