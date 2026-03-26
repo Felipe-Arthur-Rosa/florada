@@ -251,7 +251,7 @@ export function FormPedido() {
     }
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-6xl mx-auto mt-4">
+        <div className="mx-auto mt-4 grid w-full max-w-7xl grid-cols-1 gap-4 px-4 pb-6 sm:px-6 lg:grid-cols-2 lg:px-8">
             <form onSubmit={CriaPedido} className="flex flex-col border-collapse border border-gray-300 rounded-lg p-4 shadow-md">
                 <h1 className="mb-4 text-xl font-semibold">{isEditMode ? "Editar Pedido" : "Criar Pedido"}</h1>
                 {submitMessage ? (
@@ -276,20 +276,19 @@ export function FormPedido() {
                 <Input label="Mensagem do cartão" name="mensagem" type="text" onChange={AlimentaPedido} value={pedido.mensagem} />
                 <Input label="Metodo de Pagamento" name="metodoPagamento" aria-required type="text" onChange={AlimentaPedido} value={pedido.metodoPagamento} error={formErrors.metodoPagamento} />
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <Input
                         label="Produto"
                         name="produto"
                         type="text"
                         aria-required
-                        className="col-span-1"
                         value={produtoInput}
                         onChange={(e) => {
                             setProdutoInput(e.target.value);
                             setFormErrors((prev) => ({ ...prev, produtos: undefined }));
                         }}
                     />
-                    <div className="grid grid-cols-2 gap-3 col-span-1">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
                         <Input
                             label="Valor"
                             name="valor"
@@ -301,7 +300,7 @@ export function FormPedido() {
                                 setFormErrors((prev) => ({ ...prev, produtos: undefined }));
                             }}
                         />
-                        <button type="button" className="bg-purple-500 hover:bg-purple-700 text-white font-bold rounded h-12 w-12 mt-4" onClick={AlimentaProdutos}>+</button>
+                        <button type="button" className="h-12 w-full rounded bg-purple-500 font-bold text-white hover:bg-purple-700 sm:w-12" onClick={AlimentaProdutos}>+</button>
                     </div>
                 </div>
                 {formErrors.produtos ? <span className="mb-2 text-sm text-red-500">{formErrors.produtos}</span> : null}
@@ -318,7 +317,7 @@ export function FormPedido() {
                     name="status"
                     onChange={AlimentaPedido}
                     value={pedido.status.nome}
-                    className={`rounded-lg border p-2 text-sm shadow-sm ${formErrors.status ? "border-red-400" : "border-gray-300"} cursor-pointer`}
+                    className={`w-full rounded-lg border p-2 text-sm shadow-sm ${formErrors.status ? "border-red-400" : "border-gray-300"} cursor-pointer`}
                 >
                     <option value="">Status</option>
                     {status.map((status, index) => (
@@ -327,7 +326,7 @@ export function FormPedido() {
                 </select>
                 {formErrors.status ? <span className="mt-1 text-sm text-red-500">{formErrors.status}</span> : null}
                 
-                <div className="grid grid-cols-2 gap-7 mt-3">
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-7">
                     <Link className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded text-center" href={'/'}>Cancelar</Link>
                     <button className=" bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-purple-300" disabled={isSubmitting} type="submit">
                         {isSubmitting ? (isEditMode ? "Salvando..." : "Criando...") : (isEditMode ? "Salvar Edicao" : "Criar Pedido")}

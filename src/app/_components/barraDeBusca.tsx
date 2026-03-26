@@ -42,15 +42,15 @@ const BarraDeBusca: React.FC<PedidosProps> = ({ pedidos, setPedidos}) => {
     const [search, setSearch] = useState<string>("");
 
     return (
-        <div className="items-center ml-24 mb-4 mt-16">
+        <div className="mb-4 mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:items-center">
             <input
                 type="text"
                 placeholder="Buscar"
-                className="border border-gray-300 rounded-lg p-2 w-1/2 shadow-sm mr-4 md:w-9/12"
+                className="w-full rounded-lg border border-gray-300 p-2 shadow-sm sm:flex-1"
                 onChange={filtro(setSearch, setPedidos)}
             />
             <select
-                className="border flex-1 border-gray-300 rounded-lg p-2 mt-3 md:mt-0 text-sm cursor-pointer shadow-sm"
+                className="w-full rounded-lg border border-gray-300 p-2 text-sm shadow-sm sm:w-auto sm:min-w-48"
                 onChange={filtro(setSearch, setPedidos)}
             >
                 <option value="">Status</option>

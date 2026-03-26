@@ -90,14 +90,14 @@ export default function Home() {
 
   return (
     <ModalProvider>
-      <div className="flex flex-col justify-center mx-10">
+      <div className="mx-auto flex w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8">
         {showSuccessMessage ? (
           <div className="mt-6 rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-green-700">
-            <div className="flex items-start justify-between gap-4">
-              <p>{successMessage}</p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <p className="pr-2">{successMessage}</p>
               <button
                 type="button"
-                className="rounded px-2 py-1 text-sm transition hover:bg-green-100"
+                className="self-start rounded px-2 py-1 text-sm transition hover:bg-green-100"
                 onClick={() => {
                   setShowSuccessMessage(false);
                   router.replace("/");

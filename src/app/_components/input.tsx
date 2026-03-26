@@ -14,7 +14,7 @@ export default function Input({ label, error, className = "", ...props }: InputP
             </label>
             <input
                 {...props}
-                className={`rounded-lg border p-2 shadow-sm ${error ? "border-red-400" : "border-gray-300"} ${className}`.trim()}
+                className={`w-full rounded-lg border p-2 shadow-sm ${error ? "border-red-400" : "border-gray-300"} ${className}`.trim()}
             />
             {error && <span className="mt-1 text-sm text-red-500">{error}</span>}
         </div>
