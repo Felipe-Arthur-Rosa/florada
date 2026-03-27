@@ -252,15 +252,15 @@ export function FormPedido() {
 
     return (
         <div className="mx-auto mt-4 grid w-full max-w-7xl grid-cols-1 gap-4 px-4 pb-6 sm:px-6 lg:grid-cols-2 lg:px-8">
-            <form onSubmit={CriaPedido} className="flex flex-col border-collapse border border-gray-300 rounded-lg p-4 shadow-md">
+            <form onSubmit={CriaPedido} className="flex flex-col rounded-lg border border-border bg-card p-4 shadow-md">
                 <h1 className="mb-4 text-xl font-semibold">{isEditMode ? "Editar Pedido" : "Criar Pedido"}</h1>
                 {submitMessage ? (
-                    <div className={`mb-4 rounded-lg border p-3 text-sm ${submitError ? "border-red-300 bg-red-50 text-red-700" : "border-green-300 bg-green-50 text-green-700"}`}>
+                    <div className={`mb-4 rounded-lg border p-3 text-sm ${submitError ? "border-destructive/30 bg-destructive/10 text-destructive" : "border-status-active/30 bg-secondary text-secondary-foreground"}`}>
                         {submitMessage}
                     </div>
                 ) : null}
                 {isLoadingPedido ? (
-                    <div className="rounded-lg border border-gray-300 bg-gray-50 p-4 text-sm text-gray-600">
+                    <div className="rounded-lg border border-border bg-muted p-4 text-sm text-muted-foreground">
                         Carregando pedido para edicao...
                     </div>
                 ) : null}
@@ -300,10 +300,10 @@ export function FormPedido() {
                                 setFormErrors((prev) => ({ ...prev, produtos: undefined }));
                             }}
                         />
-                        <button type="button" className="h-12 w-full rounded bg-purple-500 font-bold text-white hover:bg-purple-700 sm:w-12" onClick={AlimentaProdutos}>+</button>
+                        <button type="button" className="h-12 w-full rounded bg-primary font-bold text-primary-foreground transition hover:bg-primary/90 sm:w-12" onClick={AlimentaProdutos}>+</button>
                     </div>
                 </div>
-                {formErrors.produtos ? <span className="mb-2 text-sm text-red-500">{formErrors.produtos}</span> : null}
+                {formErrors.produtos ? <span className="mb-2 text-sm text-destructive">{formErrors.produtos}</span> : null}
 
                 <Input
                     label="Valor final"
@@ -312,23 +312,23 @@ export function FormPedido() {
                     value={pedido.valorFinal ? pedido.valorFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : ""}
                 />
                 
-                <h1 className="text-sm font-semibold">Status <span className="text-red-500">*</span></h1>
+                <h1 className="text-sm font-semibold">Status <span className="text-destructive">*</span></h1>
                 <select
                     name="status"
                     onChange={AlimentaPedido}
                     value={pedido.status.nome}
-                    className={`w-full rounded-lg border p-2 text-sm shadow-sm ${formErrors.status ? "border-red-400" : "border-gray-300"} cursor-pointer`}
+                    className={`w-full cursor-pointer rounded-lg border bg-card p-2 text-sm shadow-sm ${formErrors.status ? "border-destructive" : "border-input"}`}
                 >
                     <option value="">Status</option>
                     {status.map((status, index) => (
                         <option key={index} value={status.nome}>{status.nome}</option>
                     ))}
                 </select>
-                {formErrors.status ? <span className="mt-1 text-sm text-red-500">{formErrors.status}</span> : null}
+                {formErrors.status ? <span className="mt-1 text-sm text-destructive">{formErrors.status}</span> : null}
                 
                 <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-7">
-                    <Link className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded text-center" href={'/'}>Cancelar</Link>
-                    <button className=" bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-purple-300" disabled={isSubmitting} type="submit">
+                    <Link className="rounded bg-muted px-4 py-2 text-center font-bold text-muted-foreground transition hover:bg-accent hover:text-accent-foreground" href={'/'}>Cancelar</Link>
+                    <button className="rounded bg-primary px-4 py-2 font-bold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-primary/40" disabled={isSubmitting} type="submit">
                         {isSubmitting ? (isEditMode ? "Salvando..." : "Criando...") : (isEditMode ? "Salvar Edicao" : "Criar Pedido")}
                     </button>
                 </div>

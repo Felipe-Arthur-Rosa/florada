@@ -23,7 +23,7 @@ const FiltroStatus: React.FC<FiltroProps> = ({search, titulo, setPedidos}) => {
 
     return (
         <select
-            className="border border-gray-300 rounded-lg p-2 text-sm cursor-pointer shadow-sm"
+            className="cursor-pointer rounded-lg border border-input bg-card p-2 text-sm shadow-sm"
             onChange={filtroStatus(search, setPedidos)}
         >
             <option value="">{titulo}</option> 

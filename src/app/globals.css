@@ -3,18 +3,50 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: 210 20% 96%;
+  --foreground: 210 11% 20%;
+  --card: 0 0% 100%;
+  --card-foreground: 210 11% 20%;
+  --primary: 122 39% 49%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 120 15% 92%;
+  --secondary-foreground: 120 20% 30%;
+  --muted: 210 14% 93%;
+  --muted-foreground: 210 8% 46%;
+  --accent: 40 30% 94%;
+  --accent-foreground: 40 20% 30%;
+  --destructive: 0 65% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 210 14% 89%;
+  --input: 210 14% 89%;
+  --ring: 122 39% 49%;
+  --sage: 140 20% 68%;
+  --sage-foreground: 140 25% 25%;
+  --warm: 35 30% 92%;
+  --warm-foreground: 35 20% 35%;
+  --status-active: 122 39% 49%;
+  --status-warning: 40 90% 55%;
+  --status-danger: 0 65% 55%;
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #ffffff;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 }
 
 body {
-  background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
   overflow-x: hidden;
 }

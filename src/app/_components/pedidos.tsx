@@ -23,26 +23,26 @@ const Pedidos: React.FC<PedidosProps> = ({ pedidos, isLoading, SetPedido, setIsO
         <div className="w-full">
             <h2 className="mb-2 text-lg font-semibold">Pedidos</h2>
             {isLoading ? (
-                <div className="rounded-lg border border-gray-300 bg-gray-50 p-6 text-center text-gray-600">
+                <div className="rounded-lg border border-border bg-muted p-6 text-center text-muted-foreground">
                     Carregando pedidos...
                 </div>
             ) : pedidos.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-6 text-center text-gray-600">
+                <div className="rounded-lg border border-dashed border-border bg-muted p-6 text-center text-muted-foreground">
                     Nenhum pedido foi criado ainda.
                 </div>
             ) : (
             <div className="grid grid-cols-1 gap-3 p-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {pedidos.map((pedido, index) => (
                     <div 
-                    className="min-w-0 cursor-pointer rounded-lg border border-gray-300 bg-white p-4 shadow-md transition duration-150 hover:border-gray-500 hover:shadow-lg" 
+                    className="min-w-0 cursor-pointer rounded-lg border border-border bg-card p-4 shadow-md transition duration-150 hover:border-primary/50 hover:bg-secondary/40 hover:shadow-lg" 
                     key={index} 
                     onClick={AbreModal(pedido, SetPedido, setIsOpen, isOpen)}>
                         <p className="break-words font-bold">{pedido.nomeCliente}</p>
-                        <p className="line-clamp-2 break-words text-gray-700">Telefone: {pedido.telefone}</p>
+                        <p className="line-clamp-2 break-words text-muted-foreground">Telefone: {pedido.telefone}</p>
                         {pedido.endereco ? (
-                            <p className="line-clamp-2 break-words text-gray-700">Endereço: {pedido.endereco.rua}, {pedido.endereco.numero}, {pedido.endereco.bairro}</p>
+                            <p className="line-clamp-2 break-words text-muted-foreground">Endereço: {pedido.endereco.rua}, {pedido.endereco.numero}, {pedido.endereco.bairro}</p>
                         ) : null}
-                        <p className="break-words text-gray-700">Status: {pedido.status.nome}</p>
+                        <p className="break-words text-muted-foreground">Status: {pedido.status.nome}</p>
                     </div>
                 ))}
             </div>

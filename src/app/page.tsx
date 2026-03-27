@@ -92,12 +92,12 @@ export default function Home() {
     <ModalProvider>
       <div className="mx-auto flex w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8">
         {showSuccessMessage ? (
-          <div className="mt-6 rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-green-700">
+          <div className="mt-6 rounded-lg border border-status-active/30 bg-secondary px-4 py-3 text-secondary-foreground">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <p className="pr-2">{successMessage}</p>
               <button
                 type="button"
-                className="self-start rounded px-2 py-1 text-sm transition hover:bg-green-100"
+                className="self-start rounded px-2 py-1 text-sm transition hover:bg-primary/10"
                 onClick={() => {
                   setShowSuccessMessage(false);
                   router.replace("/");

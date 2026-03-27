@@ -8,7 +8,7 @@ export default function SiteHeader() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
-        <header className="border-b border-gray-200 bg-white text-black shadow-md">
+        <header className="border-b border-border bg-card text-foreground shadow-md">
             <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
                 <Link
                     className="text-lg font-semibold transition hover:opacity-80"
@@ -19,7 +19,7 @@ export default function SiteHeader() {
                 </Link>
 
                 <nav className="hidden items-center gap-4 md:flex">
-                    <Link className="rounded-lg px-4 py-2 transition hover:bg-gray-100" href="/criarPedido">
+                    <Link className="rounded-lg px-4 py-2 transition hover:bg-secondary" href="/criarPedido">
                         Criar Pedido
                     </Link>
                 </nav>
@@ -27,7 +27,7 @@ export default function SiteHeader() {
                 <button
                     type="button"
                     aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"}
-                    className="rounded-lg p-2 transition hover:bg-gray-100 md:hidden"
+                    className="rounded-lg p-2 transition hover:bg-secondary md:hidden"
                     onClick={() => setIsMenuOpen((current) => !current)}
                 >
                     {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -35,9 +35,9 @@ export default function SiteHeader() {
             </div>
 
             {isMenuOpen ? (
-                <nav className="border-t border-gray-200 bg-white px-4 py-3 md:hidden">
+                <nav className="border-t border-border bg-card px-4 py-3 md:hidden">
                     <Link
-                        className="block rounded-lg px-3 py-2 transition hover:bg-gray-100"
+                        className="block rounded-lg px-3 py-2 transition hover:bg-secondary"
                         href="/criarPedido"
                         onClick={() => setIsMenuOpen(false)}
                     >

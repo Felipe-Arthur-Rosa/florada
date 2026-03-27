@@ -24,10 +24,10 @@ type HoverFieldProps = {
 function HoverField({ label, value }: HoverFieldProps) {
     return (
         <div className="group relative mt-2">
-            <p className="line-clamp-2 break-words rounded border border-transparent pr-2 text-gray-900 transition hover:border-gray-200 hover:bg-gray-50">
+            <p className="line-clamp-2 break-words rounded border border-transparent pr-2 text-foreground transition hover:border-border hover:bg-muted">
                 <strong>{label}:</strong> {value}
             </p>
-            <div className="pointer-events-none absolute left-0 top-full z-20 mt-2 w-full rounded-lg border border-gray-300 bg-white p-3 text-sm text-gray-800 opacity-0 shadow-lg transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 hover:pointer-events-auto hover:opacity-100">
+            <div className="pointer-events-none absolute left-0 top-full z-20 mt-2 w-full rounded-lg border border-border bg-card p-3 text-sm text-card-foreground opacity-0 shadow-lg transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 hover:pointer-events-auto hover:opacity-100">
                 <strong>{label}:</strong> {value}
             </div>
         </div>
@@ -114,14 +114,14 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
 
     return (
 
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-30 px-4" style={{ display: isOpen ? "flex" : "none" }}
+        <div className="fixed inset-0 flex items-center justify-center bg-foreground/30 px-4" style={{ display: isOpen ? "flex" : "none" }}
             onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
                 if (e.target === e.currentTarget) {
                     setShowActionsMenu(false);
                     onClose();
                 }
             }}>
-            <div className="mt-10 mb-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto overflow-x-hidden rounded-lg border border-gray-300 bg-white p-4 shadow-md">
+            <div className="mb-10 mt-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto overflow-x-hidden rounded-lg border border-border bg-card p-4 shadow-md">
                 <div className="relative mb-2 flex items-center justify-center">
                     <button
                         type="button"
@@ -130,7 +130,7 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
                             setShowActionsMenu(false);
                             onClose();
                         }}
-                        className="absolute left-0 top-0 rounded-full p-2 text-gray-600 transition hover:bg-gray-100 hover:text-gray-800"
+                        className="absolute left-0 top-0 rounded-full p-2 text-muted-foreground transition hover:bg-secondary hover:text-foreground"
                     >
                         <X size={20} />
                     </button>
@@ -140,23 +140,23 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
                             type="button"
                             aria-label="Abrir opcoes do pedido"
                             onClick={() => setShowActionsMenu((current) => !current)}
-                            className="rounded-full p-2 text-gray-600 transition hover:bg-gray-100 hover:text-gray-800"
+                            className="rounded-full p-2 text-muted-foreground transition hover:bg-secondary hover:text-foreground"
                         >
                             <MoreVertical size={20} />
                         </button>
                         {showActionsMenu ? (
-                            <div className="absolute right-0 top-10 z-10 min-w-36 rounded-lg border border-gray-200 bg-white py-2 shadow-lg">
+                            <div className="absolute right-0 top-10 z-10 min-w-36 rounded-lg border border-border bg-card py-2 shadow-lg">
                                 <button
                                     type="button"
                                     onClick={IrParaEdicao}
-                                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-100"
+                                    className="block w-full px-4 py-2 text-left text-sm text-muted-foreground transition hover:bg-secondary hover:text-foreground"
                                 >
                                     Editar
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => pedido ? ExcluirPedido() : null}
-                                    className="block w-full px-4 py-2 text-left text-sm text-red-600 transition hover:bg-red-50"
+                                    className="block w-full px-4 py-2 text-left text-sm text-destructive transition hover:bg-destructive/10"
                                 >
                                     Excluir
                                 </button>
@@ -187,7 +187,7 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
                     {pedido?.metodoPagamento ? <HoverField label="Método de Pagamento" value={pedido.metodoPagamento} /> : null}
 
                     {pedido?.mensagem ?
-                        <div className="mt-2 rounded border border-gray-300 p-2">
+                        <div className="mt-2 rounded border border-border p-2">
                             <p><strong>Mensagem:</strong></p>
                             <div className="mt-2 max-h-40 overflow-y-auto whitespace-pre-wrap break-words">
                                 <p>{pedido?.mensagem}</p>
@@ -198,7 +198,7 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
 
                     {/* Lista de Produtos */}
                     <p className="mt-2"><strong>Produtos:</strong></p>
-                    <div className="pl-6 list-disc max-h-40 overflow-y-auto border border-gray-300 rounded p-2">
+                    <div className="max-h-40 list-disc overflow-y-auto rounded border border-border p-2 pl-6">
                         <ul>
                             {pedido?.produtos?.map((produto, index) => (
                                 <li key={index}>{produto.nome} - R$ {produto.valor}</li>
@@ -209,7 +209,7 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
                     <p className="mt-2"><strong>Status</strong></p>
                     <select
                         defaultValue={pedido?.status?.nome || ""}
-                        className="border border-gray-300 rounded-lg p-2 text-sm cursor-pointer shadow-sm mb-3"
+                        className="mb-3 cursor-pointer rounded-lg border border-input bg-card p-2 text-sm shadow-sm"
                         name="status"
                     >
                         <option value="">Status</option>
@@ -221,7 +221,7 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
                     <div className="mt-4 flex justify-center">
                         <button
                             onClick={() => pedido ? AtualizarPedido() : null}
-                            className="px-7 py-3 bg-green-500 hover:bg-green-700 text-white rounded"
+                            className="rounded bg-primary px-7 py-3 text-primary-foreground transition hover:bg-primary/90"
                         >
                             Salvar
                         </button>
