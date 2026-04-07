@@ -9,12 +9,12 @@ import { PedidoModal } from "@/components/modal";
 import { useRouter } from "next/navigation";
 
 export type Endereco = {
-  rua: string,
-  numero: string,
-  bairro: string,
-  cidade: string,
-  complemento: string,
-  dataHoraEntrega: string
+  rua?: string,
+  numero?: string | number,
+  bairro?: string,
+  cidade?: string,
+  complemento?: string,
+  dataHoraEntrega?: string
 };
 
 export type Produto = {

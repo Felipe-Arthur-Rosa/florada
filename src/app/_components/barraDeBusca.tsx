@@ -21,12 +21,16 @@ const filtro = (
 
             setPedidos(
                 pedidos.filter((pedido: Pedido) => {
+                    const rua = String(pedido.endereco?.rua ?? "").toLowerCase();
+                    const bairro = String(pedido.endereco?.bairro ?? "").toLowerCase();
+                    const buscaNormalizada = busca.toLowerCase();
+
                     const atendeBusca =
                         busca === "" ||
-                        pedido.nomeCliente.toLowerCase().includes(busca.toLowerCase()) ||
+                        pedido.nomeCliente.toLowerCase().includes(buscaNormalizada) ||
                         pedido.telefone.includes(busca) ||
-                        pedido.endereco?.rua.toLowerCase().includes(busca.toLowerCase()) ||
-                        pedido.endereco?.bairro.toLowerCase().includes(busca.toLowerCase());
+                        rua.includes(buscaNormalizada) ||
+                        bairro.includes(buscaNormalizada);
 
                     const atendeStatus = status === "" || pedido.status.nome === status;
 

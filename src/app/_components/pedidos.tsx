@@ -10,12 +10,29 @@ export type PedidosProps = {
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-function AbreModal(pedido: Pedido, setPedido: React.Dispatch<React.SetStateAction<Pedido | null>>, setIsOpen: React.Dispatch<React.SetStateAction<boolean>>, isOpen: boolean) {
-        return function (_e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+function AbreModal(
+    pedido: Pedido,
+    setPedido: React.Dispatch<React.SetStateAction<Pedido | null>>,
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    isOpen: boolean
+) {
+    return function (_e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
         console.log(pedido);
         setPedido(pedido);
         setIsOpen(!isOpen);
+    };
+}
+
+function formatEnderecoResumo(pedido: Pedido) {
+    if (!pedido.endereco) {
+        return null;
     }
+
+    const partes = [pedido.endereco.rua, pedido.endereco.numero, pedido.endereco.bairro]
+        .map((value) => String(value ?? "").trim())
+        .filter(Boolean);
+
+    return partes.length > 0 ? partes.join(", ") : null;
 }
 
 const Pedidos: React.FC<PedidosProps> = ({ pedidos, isLoading, SetPedido, setIsOpen, isOpen }) => {
@@ -31,24 +48,29 @@ const Pedidos: React.FC<PedidosProps> = ({ pedidos, isLoading, SetPedido, setIsO
                     Nenhum pedido foi criado ainda.
                 </div>
             ) : (
-            <div className="grid grid-cols-1 gap-3 p-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {pedidos.map((pedido, index) => (
-                    <div 
-                    className="min-w-0 cursor-pointer rounded-lg border border-border bg-card p-4 shadow-md transition duration-150 hover:border-primary/50 hover:bg-secondary/40 hover:shadow-lg" 
-                    key={index} 
-                    onClick={AbreModal(pedido, SetPedido, setIsOpen, isOpen)}>
-                        <p className="break-words font-bold">{pedido.nomeCliente}</p>
-                        <p className="line-clamp-2 break-words text-muted-foreground">Telefone: {pedido.telefone}</p>
-                        {pedido.endereco ? (
-                            <p className="line-clamp-2 break-words text-muted-foreground">Endereço: {pedido.endereco.rua}, {pedido.endereco.numero}, {pedido.endereco.bairro}</p>
-                        ) : null}
-                        <p className="break-words text-muted-foreground">Status: {pedido.status.nome}</p>
-                    </div>
-                ))}
-            </div>
+                <div className="grid grid-cols-1 gap-3 p-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {pedidos.map((pedido, index) => {
+                        const enderecoResumo = formatEnderecoResumo(pedido);
+
+                        return (
+                            <div
+                                className="min-w-0 cursor-pointer rounded-lg border border-border bg-card p-4 shadow-md transition duration-150 hover:border-primary/50 hover:bg-secondary/40 hover:shadow-lg"
+                                key={index}
+                                onClick={AbreModal(pedido, SetPedido, setIsOpen, isOpen)}
+                            >
+                                <p className="break-words font-bold">{pedido.nomeCliente}</p>
+                                <p className="line-clamp-2 break-words text-muted-foreground">Telefone: {pedido.telefone}</p>
+                                {enderecoResumo ? (
+                                    <p className="line-clamp-2 break-words text-muted-foreground">Endereco: {enderecoResumo}</p>
+                                ) : null}
+                                <p className="break-words text-muted-foreground">Status: {pedido.status.nome}</p>
+                            </div>
+                        );
+                    })}
+                </div>
             )}
         </div>
     );
-}
+};
 
 export { Pedidos };

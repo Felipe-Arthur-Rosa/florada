@@ -34,10 +34,28 @@ function HoverField({ label, value }: HoverFieldProps) {
     );
 }
 
+function formatEnderecoCompleto(pedido: Pedido | null) {
+    if (!pedido?.endereco) {
+        return null;
+    }
+
+    const partes = [
+        pedido.endereco.rua,
+        pedido.endereco.bairro,
+        pedido.endereco.numero,
+        pedido.endereco.cidade,
+    ]
+        .map((value) => String(value ?? "").trim())
+        .filter(Boolean);
+
+    return partes.length > 0 ? partes.join(", ") : null;
+}
+
 const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAlterado }) => {
     const router = useRouter();
     const [showActionsMenu, setShowActionsMenu] = useState(false);
     const actionsMenuRef = useRef<HTMLDivElement | null>(null);
+    const enderecoCompleto = formatEnderecoCompleto(pedido);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -172,8 +190,8 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
 
                     <p className="mt-2">Telefone: {pedido?.telefone}</p>
 
-                    {pedido?.endereco ?
-                        <HoverField label="Endereço" value={`Rua ${pedido.endereco.rua}, ${pedido.endereco.bairro}, ${pedido.endereco.numero}, ${pedido.endereco.cidade}`} />
+                    {enderecoCompleto ?
+                        <HoverField label="Endereco" value={enderecoCompleto} />
                         : null}
 
                     {pedido?.endereco?.complemento ?
@@ -184,7 +202,7 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
                         <HoverField label="Data e Hora de Entrega" value={pedido.endereco.dataHoraEntrega} />
                         : null}
 
-                    {pedido?.metodoPagamento ? <HoverField label="Método de Pagamento" value={pedido.metodoPagamento} /> : null}
+                    {pedido?.metodoPagamento ? <HoverField label="Metodo de Pagamento" value={pedido.metodoPagamento} /> : null}
 
                     {pedido?.mensagem ?
                         <div className="mt-2 rounded border border-border p-2">
@@ -196,7 +214,6 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
                     }
 
 
-                    {/* Lista de Produtos */}
                     <p className="mt-2"><strong>Produtos:</strong></p>
                     <div className="max-h-40 list-disc overflow-y-auto rounded border border-border p-2 pl-6">
                         <ul>
