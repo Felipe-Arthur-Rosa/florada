@@ -1,6 +1,7 @@
 'use client';
 
 import PedidoPut from "@/actions/pedido-put";
+import { pdf } from "@react-pdf/renderer";
 import { status } from "../actions/status-get";
 import Input from "../app/_components/input";
 import { Pedido } from "../app/page";
@@ -8,6 +9,7 @@ import React, { useEffect, useRef, useState } from "react";
 import DeletePedido from "@/actions/pedido-delete";
 import { useRouter } from "next/navigation";
 import { MoreVertical, X } from "lucide-react";
+import { PedidoPdfDocument } from "./pedido-pdf-document";
 
 interface ModalProps {
     isOpen: boolean;
@@ -17,11 +19,6 @@ interface ModalProps {
 }
 
 type HoverFieldProps = {
-    label: string;
-    value: string;
-};
-
-type PrintField = {
     label: string;
     value: string;
 };
@@ -44,256 +41,42 @@ function formatEnderecoCompleto(pedido: Pedido | null) {
         return null;
     }
 
-    const partes = [
-        pedido.endereco.rua,
-        pedido.endereco.bairro,
-        pedido.endereco.numero,
-        pedido.endereco.cidade,
-    ]
-        .map((value) => String(value ?? "").trim())
-        .filter(Boolean);
-
-    return partes.length > 0 ? partes.join(", ") : null;
-}
-
-function formatCurrency(value: number) {
-    return value.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-    });
-}
-
-function escapeHtml(value: string) {
-    return value
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
-}
-
-function buildPrintField(label: string, value: unknown): PrintField | null {
-    const text = String(value ?? "").trim();
-    return text ? { label, value: text } : null;
-}
-
-function buildPedidoPrintHtml(pedido: Pedido, statusAtual: string, entregadorAtual: string) {
-    const enderecoCompleto = formatEnderecoCompleto(pedido);
     const campos = [
-        buildPrintField("Cliente", pedido.nomeCliente),
-        buildPrintField("Destinatario", pedido.destinatario),
-        buildPrintField("Telefone", pedido.telefone),
-        buildPrintField("Endereco", enderecoCompleto),
-        buildPrintField("Complemento", pedido.endereco?.complemento),
-        buildPrintField("Data de entrega", pedido.endereco?.dataHoraEntrega),
-        buildPrintField("Metodo de pagamento", pedido.metodoPagamento),
-        buildPrintField("Status", statusAtual || pedido.status.nome),
-        buildPrintField("Entregador", entregadorAtual || pedido.entregador),
-        buildPrintField("Pedido", pedido._id),
-    ].filter((campo): campo is PrintField => campo !== null);
+        { nome: "rua", valor: pedido.endereco.rua },
+        { nome: "bairro", valor: pedido.endereco.bairro },
+        { nome: "numero", valor: pedido.endereco.numero },
+        { nome: "cidade", valor: pedido.endereco.cidade },
+    ]
+        .map((campo) => ({ ...campo, valor: String(campo.valor ?? "").trim() }))
+        .filter((campo) => campo.valor);
 
-    const camposHtml = campos
-        .map(
-            (campo) => `
-                <div class="field">
-                    <div class="field-label">${escapeHtml(campo.label)}</div>
-                    <div class="field-value">${escapeHtml(campo.value)}</div>
-                </div>
-            `
-        )
-        .join("");
+    if (campos.length === 0) {
+        return null;
+    }
 
-    const produtosHtml = pedido.produtos
-        .map(
-            (produto) => `
-                <tr>
-                    <td>${escapeHtml(produto.nome)}</td>
-                    <td class="price">${escapeHtml(formatCurrency(produto.valor))}</td>
-                </tr>
-            `
-        )
-        .join("");
+    const enderecoCompleto = campos.length === 4;
 
-    const mensagemHtml = String(pedido.mensagem ?? "").trim()
-        ? `
-            <section class="section">
-                <h2>Mensagem</h2>
-                <div class="message">${escapeHtml(pedido.mensagem)}</div>
-            </section>
-        `
-        : "";
+    return {
+        label: enderecoCompleto ? "Endereco" : "Endereco (Incompleto)",
+        value: enderecoCompleto
+            ? campos.map((campo) => campo.valor).join(", ")
+            : campos.map((campo) => `${campo.nome}: ${campo.valor}`).join(", "),
+    };
+}
 
-    return `
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-            <head>
-                <meta charset="UTF-8" />
-                <title>Guia do Pedido</title>
-                <style>
-                    :root {
-                        color-scheme: light;
-                    }
-                    * {
-                        box-sizing: border-box;
-                    }
-                    body {
-                        margin: 0;
-                        font-family: Arial, Helvetica, sans-serif;
-                        background: #f4f6f3;
-                        color: #1f2933;
-                    }
-                    .page {
-                        width: 210mm;
-                        min-height: 297mm;
-                        margin: 0 auto;
-                        padding: 16mm;
-                        background: #ffffff;
-                    }
-                    .header {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: flex-start;
-                        gap: 16px;
-                        border-bottom: 2px solid #d9e3d8;
-                        padding-bottom: 12px;
-                        margin-bottom: 18px;
-                    }
-                    .title {
-                        margin: 0;
-                        font-size: 28px;
-                        line-height: 1.1;
-                    }
-                    .subtitle {
-                        margin-top: 6px;
-                        color: #52606d;
-                        font-size: 14px;
-                    }
-                    .meta {
-                        text-align: right;
-                        font-size: 13px;
-                        color: #52606d;
-                    }
-                    .section {
-                        margin-top: 20px;
-                    }
-                    .section h2 {
-                        margin: 0 0 12px;
-                        font-size: 16px;
-                    }
-                    .grid {
-                        display: grid;
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
-                        gap: 12px;
-                    }
-                    .field {
-                        border: 1px solid #d9e2ec;
-                        border-radius: 10px;
-                        padding: 10px 12px;
-                        background: #fbfcfa;
-                        break-inside: avoid;
-                    }
-                    .field-label {
-                        font-size: 11px;
-                        text-transform: uppercase;
-                        letter-spacing: 0.08em;
-                        color: #7b8794;
-                        margin-bottom: 6px;
-                    }
-                    .field-value {
-                        font-size: 15px;
-                        white-space: pre-wrap;
-                        word-break: break-word;
-                    }
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        border: 1px solid #d9e2ec;
-                        border-radius: 10px;
-                        overflow: hidden;
-                    }
-                    th, td {
-                        padding: 10px 12px;
-                        border-bottom: 1px solid #d9e2ec;
-                        text-align: left;
-                    }
-                    th {
-                        background: #f0f4f8;
-                        font-size: 12px;
-                        text-transform: uppercase;
-                        letter-spacing: 0.08em;
-                        color: #52606d;
-                    }
-                    tr:last-child td {
-                        border-bottom: none;
-                    }
-                    .price {
-                        text-align: right;
-                        white-space: nowrap;
-                    }
-                    .total {
-                        margin-top: 12px;
-                        display: flex;
-                        justify-content: flex-end;
-                        font-size: 18px;
-                        font-weight: 700;
-                    }
-                    .message {
-                        border: 1px solid #d9e2ec;
-                        border-radius: 10px;
-                        padding: 12px;
-                        white-space: pre-wrap;
-                        word-break: break-word;
-                        background: #fbfcfa;
-                    }
-                    @media print {
-                        body {
-                            background: #ffffff;
-                        }
-                        .page {
-                            width: auto;
-                            min-height: auto;
-                            margin: 0;
-                            padding: 0;
-                        }
-                    }
-                </style>
-            </head>
-            <body>
-                <main class="page">
-                    <header class="header">
-                        <div>
-                            <h1 class="title">Guia de Pedido</h1>
-                            <div class="subtitle">Resumo pronto para impressao ou salvar em PDF</div>
-                        </div>
-                        <div class="meta">
-                            <div>Emitido em ${escapeHtml(new Date().toLocaleString("pt-BR"))}</div>
-                        </div>
-                    </header>
+function openPdfBlob(blob: Blob) {
+    const printUrl = URL.createObjectURL(blob);
+    const printWindow = window.open(printUrl, "_blank");
 
-                    <section class="section">
-                        <h2>Dados do pedido</h2>
-                        <div class="grid">${camposHtml}</div>
-                    </section>
+    if (!printWindow) {
+        console.error("Nao foi possivel abrir o PDF do pedido.");
+        URL.revokeObjectURL(printUrl);
+        return;
+    }
 
-                    <section class="section">
-                        <h2>Produtos</h2>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Produto</th>
-                                    <th class="price">Valor</th>
-                                </tr>
-                            </thead>
-                            <tbody>${produtosHtml}</tbody>
-                        </table>
-                        <div class="total">Total: ${escapeHtml(formatCurrency(pedido.valorFinal))}</div>
-                    </section>
-
-                    ${mensagemHtml}
-                </main>
-            </body>
-        </html>
-    `;
+    window.setTimeout(() => {
+        URL.revokeObjectURL(printUrl);
+    }, 60_000);
 }
 
 const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAlterado }) => {
@@ -374,7 +157,7 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
         router.push(`/criarPedido?pedidoId=${pedido._id}`);
     }
 
-    function ImprimirPedido() {
+    async function ImprimirPedido() {
         if (!pedido) {
             return;
         }
@@ -383,20 +166,20 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
         const entregadorInput = document.querySelector('input[name="entregador"]') as HTMLInputElement | null;
         const statusAtual = statusSelect?.value || pedido.status.nome;
         const entregadorAtual = entregadorInput?.value || pedido.entregador || "";
-        const printWindow = window.open("", "_blank", "noopener,noreferrer,width=900,height=700");
 
-        if (!printWindow) {
-            console.error("Nao foi possivel abrir a janela de impressao.");
-            return;
+        try {
+            const blob = await pdf(
+                <PedidoPdfDocument
+                    pedido={pedido}
+                    statusAtual={statusAtual}
+                    entregadorAtual={entregadorAtual}
+                />
+            ).toBlob();
+
+            openPdfBlob(blob);
+        } catch (error) {
+            console.error("Nao foi possivel gerar o PDF do pedido:", error);
         }
-
-        printWindow.document.open();
-        printWindow.document.write(buildPedidoPrintHtml(pedido, statusAtual, entregadorAtual));
-        printWindow.document.close();
-        printWindow.focus();
-        printWindow.onload = () => {
-            printWindow.print();
-        };
 
         setShowActionsMenu(false);
     }
@@ -470,7 +253,7 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
                     <p className="mt-2">Telefone: {pedido?.telefone}</p>
 
                     {enderecoCompleto ?
-                        <HoverField label="Endereco" value={enderecoCompleto} />
+                        <HoverField label={enderecoCompleto.label} value={enderecoCompleto.value} />
                         : null}
 
                     {pedido?.endereco?.complemento ?

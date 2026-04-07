@@ -165,8 +165,12 @@ export function FormPedido() {
             return;
         }
 
+        const proximoId = pedido.produtos.reduce((maiorId, produto) => {
+            return produto.id > maiorId ? produto.id : maiorId;
+        }, 0) + 1;
+
         const novoProduto = {
-            id: pedido.produtos.length + 1,
+            id: proximoId,
             nome: produtoInput.trim(),
             valor: valorNumerico
         };
@@ -188,19 +192,19 @@ export function FormPedido() {
     }
 
 function AlimentaPedido(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
-        const { name } = e.target;
+        const { name, value: rawValue } = e.target;
         const value =
             name === "telefone"
-                ? formatPhoneNumber(e.target.value)
+                ? formatPhoneNumber(rawValue)
                 : name === "numero"
-                    ? (e.target.value === "" ? undefined : Number(e.target.value))
-                    : e.target.value;
+                    ? (rawValue === "" ? undefined : Number(rawValue))
+                    : rawValue;
 
         setPedido((prev) => {
             if (name === "status") {
                 return {
                     ...prev,
-                    status: { nome: value }
+                    status: { nome: rawValue }
                 };
             }
 
