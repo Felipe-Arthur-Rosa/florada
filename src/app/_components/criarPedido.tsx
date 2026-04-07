@@ -90,7 +90,7 @@ function createEmptyPedido(): Pedido {
         telefone: "",
         endereco: {
             rua: "",
-            numero: "",
+            numero: undefined,
             bairro: "",
             cidade: "",
             complemento: "",
@@ -187,9 +187,14 @@ export function FormPedido() {
         setFormErrors((prev) => ({ ...prev, produtos: undefined }));
     }
 
-    function AlimentaPedido(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+function AlimentaPedido(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
         const { name } = e.target;
-        const value = name === "telefone" ? formatPhoneNumber(e.target.value) : e.target.value;
+        const value =
+            name === "telefone"
+                ? formatPhoneNumber(e.target.value)
+                : name === "numero"
+                    ? (e.target.value === "" ? undefined : Number(e.target.value))
+                    : e.target.value;
 
         setPedido((prev) => {
             if (name === "status") {
