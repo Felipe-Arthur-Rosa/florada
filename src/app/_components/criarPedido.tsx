@@ -19,6 +19,8 @@ type FormErrors = {
     produtos?: string;
 };
 
+const MAX_PRODUCT_VALUE = 1_000_000_000_000;
+
 function formatPhoneNumber(value: string) {
     const digits = value.replace(/\D/g, "").slice(0, 11);
 
@@ -39,7 +41,7 @@ function formatPhoneNumber(value: string) {
 
 function formatCurrencyInput(value: string) {
     const digits = value.replace(/\D/g, "");
-    const amount = Number(digits || "0") / 100;
+    const amount = Math.min(Number(digits || "0") / 100, MAX_PRODUCT_VALUE);
 
     return amount.toLocaleString("pt-BR", {
         style: "currency",
@@ -49,7 +51,7 @@ function formatCurrencyInput(value: string) {
 
 function parseCurrencyInput(value: string) {
     const digits = value.replace(/\D/g, "");
-    return Number(digits || "0") / 100;
+    return Math.min(Number(digits || "0") / 100, MAX_PRODUCT_VALUE);
 }
 
 function validatePedido(pedido: Pedido): FormErrors {
@@ -161,6 +163,14 @@ export function FormPedido() {
             setFormErrors((prev) => ({
                 ...prev,
                 produtos: "Preencha produto e valor antes de adicionar.",
+            }));
+            return;
+        }
+
+        if (valorNumerico > MAX_PRODUCT_VALUE) {
+            setFormErrors((prev) => ({
+                ...prev,
+                produtos: "O valor maximo por produto e R$ 1.000.000.000.000,00.",
             }));
             return;
         }
