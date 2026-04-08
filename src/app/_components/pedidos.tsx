@@ -28,11 +28,27 @@ function formatEnderecoResumo(pedido: Pedido) {
         return null;
     }
 
-    const partes = [pedido.endereco.rua, pedido.endereco.numero, pedido.endereco.bairro]
-        .map((value) => String(value ?? "").trim())
-        .filter(Boolean);
+    const campos = [
+        { nome: "rua", valor: pedido.endereco.rua },
+        { nome: "numero", valor: pedido.endereco.numero },
+        { nome: "bairro", valor: pedido.endereco.bairro },
+        { nome: "cidade", valor: pedido.endereco.cidade },
+    ]
+        .map((campo) => ({ ...campo, valor: String(campo.valor ?? "").trim() }))
+        .filter((campo) => campo.valor);
 
-    return partes.length > 0 ? partes.join(", ") : null;
+    if (campos.length === 0) {
+        return null;
+    }
+
+    const enderecoCompleto = campos.length === 4;
+
+    return {
+        label: enderecoCompleto ? "Endereco" : "Endereco (Incompleto)",
+        value: enderecoCompleto
+            ? campos.map((campo) => campo.valor).join(", ")
+            : campos.map((campo) => `${campo.nome}: ${campo.valor}`).join(", "),
+    };
 }
 
 const Pedidos: React.FC<PedidosProps> = ({ pedidos, isLoading, SetPedido, setIsOpen, isOpen }) => {
@@ -61,7 +77,7 @@ const Pedidos: React.FC<PedidosProps> = ({ pedidos, isLoading, SetPedido, setIsO
                                 <p className="break-words font-bold">{pedido.nomeCliente}</p>
                                 <p className="line-clamp-2 break-words text-muted-foreground">Telefone: {pedido.telefone}</p>
                                 {enderecoResumo ? (
-                                    <p className="line-clamp-2 break-words text-muted-foreground">Endereco: {enderecoResumo}</p>
+                                    <p className="line-clamp-2 break-words text-muted-foreground">{enderecoResumo.label}: {enderecoResumo.value}</p>
                                 ) : null}
                                 <p className="break-words text-muted-foreground">Status: {pedido.status.nome}</p>
                             </div>

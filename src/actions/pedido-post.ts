@@ -12,7 +12,9 @@ export type PedidoPostResult = {
 function normalizePedidoPayload(pedido: Pedido) {
     const endereco = pedido.endereco
         ? Object.fromEntries(
-            Object.entries(pedido.endereco).filter(([, value]) => value !== undefined && value !== null && value !== "")
+            Object.entries(pedido.endereco)
+                .map(([key, value]) => [key, key === "numero" && value !== undefined && value !== null && value !== "" ? Number(value) : value])
+                .filter(([, value]) => value !== undefined && value !== null && value !== "")
         )
         : null;
 

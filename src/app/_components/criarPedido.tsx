@@ -19,6 +19,8 @@ type FormErrors = {
     produtos?: string;
 };
 
+const MAX_PRODUCT_VALUE = 1_000_000_000_000;
+
 function formatPhoneNumber(value: string) {
     const digits = value.replace(/\D/g, "").slice(0, 11);
 
@@ -39,7 +41,7 @@ function formatPhoneNumber(value: string) {
 
 function formatCurrencyInput(value: string) {
     const digits = value.replace(/\D/g, "");
-    const amount = Number(digits || "0") / 100;
+    const amount = Math.min(Number(digits || "0") / 100, MAX_PRODUCT_VALUE);
 
     return amount.toLocaleString("pt-BR", {
         style: "currency",
@@ -49,7 +51,7 @@ function formatCurrencyInput(value: string) {
 
 function parseCurrencyInput(value: string) {
     const digits = value.replace(/\D/g, "");
-    return Number(digits || "0") / 100;
+    return Math.min(Number(digits || "0") / 100, MAX_PRODUCT_VALUE);
 }
 
 function validatePedido(pedido: Pedido): FormErrors {
@@ -90,7 +92,7 @@ function createEmptyPedido(): Pedido {
         telefone: "",
         endereco: {
             rua: "",
-            numero: "",
+            numero: undefined,
             bairro: "",
             cidade: "",
             complemento: "",
@@ -165,8 +167,20 @@ export function FormPedido() {
             return;
         }
 
+        if (valorNumerico > MAX_PRODUCT_VALUE) {
+            setFormErrors((prev) => ({
+                ...prev,
+                produtos: "O valor maximo por produto e R$ 1.000.000.000.000,00.",
+            }));
+            return;
+        }
+
+        const proximoId = pedido.produtos.reduce((maiorId, produto) => {
+            return produto.id > maiorId ? produto.id : maiorId;
+        }, 0) + 1;
+
         const novoProduto = {
-            id: pedido.produtos.length + 1,
+            id: proximoId,
             nome: produtoInput.trim(),
             valor: valorNumerico
         };
@@ -187,15 +201,20 @@ export function FormPedido() {
         setFormErrors((prev) => ({ ...prev, produtos: undefined }));
     }
 
-    function AlimentaPedido(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
-        const { name } = e.target;
-        const value = name === "telefone" ? formatPhoneNumber(e.target.value) : e.target.value;
+function AlimentaPedido(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+        const { name, value: rawValue } = e.target;
+        const value =
+            name === "telefone"
+                ? formatPhoneNumber(rawValue)
+                : name === "numero"
+                    ? (rawValue === "" ? undefined : Number(rawValue))
+                    : rawValue;
 
         setPedido((prev) => {
             if (name === "status") {
                 return {
                     ...prev,
-                    status: { nome: value }
+                    status: { nome: rawValue }
                 };
             }
 

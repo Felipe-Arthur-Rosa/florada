@@ -1,6 +1,7 @@
 'use client';
 
 import PedidoPut from "@/actions/pedido-put";
+import { pdf } from "@react-pdf/renderer";
 import { status } from "../actions/status-get";
 import Input from "../app/_components/input";
 import { Pedido } from "../app/page";
@@ -8,6 +9,7 @@ import React, { useEffect, useRef, useState } from "react";
 import DeletePedido from "@/actions/pedido-delete";
 import { useRouter } from "next/navigation";
 import { MoreVertical, X } from "lucide-react";
+import { PedidoPdfDocument } from "./pedido-pdf-document";
 
 interface ModalProps {
     isOpen: boolean;
@@ -39,16 +41,42 @@ function formatEnderecoCompleto(pedido: Pedido | null) {
         return null;
     }
 
-    const partes = [
-        pedido.endereco.rua,
-        pedido.endereco.bairro,
-        pedido.endereco.numero,
-        pedido.endereco.cidade,
+    const campos = [
+        { nome: "rua", valor: pedido.endereco.rua },
+        { nome: "bairro", valor: pedido.endereco.bairro },
+        { nome: "numero", valor: pedido.endereco.numero },
+        { nome: "cidade", valor: pedido.endereco.cidade },
     ]
-        .map((value) => String(value ?? "").trim())
-        .filter(Boolean);
+        .map((campo) => ({ ...campo, valor: String(campo.valor ?? "").trim() }))
+        .filter((campo) => campo.valor);
 
-    return partes.length > 0 ? partes.join(", ") : null;
+    if (campos.length === 0) {
+        return null;
+    }
+
+    const enderecoCompleto = campos.length === 4;
+
+    return {
+        label: enderecoCompleto ? "Endereco" : "Endereco (Incompleto)",
+        value: enderecoCompleto
+            ? campos.map((campo) => campo.valor).join(", ")
+            : campos.map((campo) => `${campo.nome}: ${campo.valor}`).join(", "),
+    };
+}
+
+function openPdfBlob(blob: Blob) {
+    const printUrl = URL.createObjectURL(blob);
+    const printWindow = window.open(printUrl, "_blank");
+
+    if (!printWindow) {
+        console.error("Nao foi possivel abrir o PDF do pedido.");
+        URL.revokeObjectURL(printUrl);
+        return;
+    }
+
+    window.setTimeout(() => {
+        URL.revokeObjectURL(printUrl);
+    }, 60_000);
 }
 
 const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAlterado }) => {
@@ -129,6 +157,33 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
         router.push(`/criarPedido?pedidoId=${pedido._id}`);
     }
 
+    async function ImprimirPedido() {
+        if (!pedido) {
+            return;
+        }
+
+        const statusSelect = document.querySelector('select[name="status"]') as HTMLSelectElement | null;
+        const entregadorInput = document.querySelector('input[name="entregador"]') as HTMLInputElement | null;
+        const statusAtual = statusSelect?.value || pedido.status.nome;
+        const entregadorAtual = entregadorInput?.value || pedido.entregador || "";
+
+        try {
+            const blob = await pdf(
+                <PedidoPdfDocument
+                    pedido={pedido}
+                    statusAtual={statusAtual}
+                    entregadorAtual={entregadorAtual}
+                />
+            ).toBlob();
+
+            openPdfBlob(blob);
+        } catch (error) {
+            console.error("Nao foi possivel gerar o PDF do pedido:", error);
+        }
+
+        setShowActionsMenu(false);
+    }
+
 
     return (
 
@@ -173,6 +228,13 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
                                 </button>
                                 <button
                                     type="button"
+                                    onClick={ImprimirPedido}
+                                    className="block w-full px-4 py-2 text-left text-sm text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                                >
+                                    Imprimir guia
+                                </button>
+                                <button
+                                    type="button"
                                     onClick={() => pedido ? ExcluirPedido() : null}
                                     className="block w-full px-4 py-2 text-left text-sm text-destructive transition hover:bg-destructive/10"
                                 >
@@ -191,7 +253,7 @@ const PedidoModal: React.FC<ModalProps> = ({ isOpen, pedido, onClose, onPedidoAl
                     <p className="mt-2">Telefone: {pedido?.telefone}</p>
 
                     {enderecoCompleto ?
-                        <HoverField label="Endereco" value={enderecoCompleto} />
+                        <HoverField label={enderecoCompleto.label} value={enderecoCompleto.value} />
                         : null}
 
                     {pedido?.endereco?.complemento ?
