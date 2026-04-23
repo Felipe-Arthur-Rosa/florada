@@ -36,14 +36,14 @@ type AuxiliaryCard = {
 
 const FIELD_MAX_CHARS = 52;
 const ADDRESS_MAX_CHARS = 72;
-const PRODUCT_NAME_MAX_CHARS = 28;
+const PRODUCT_NAME_MAX_CHARS = 42;
 const MESSAGE_MAX_CHARS = 180;
 const MAX_PRODUCTS_IN_PDF = 6;
 const TOTAL_MAX_CHARS = 30;
-const CARDS_PER_PAGE = 4;
-const MAIN_MAX_FIELDS = 8;
-const MAIN_MAX_PRODUCTS = 3;
-const MAIN_MESSAGE_MAX_CHARS = 120;
+const CARDS_PER_PAGE = 1;
+const MAIN_MAX_FIELDS = 9;
+const MAIN_MAX_PRODUCTS = 4;
+const MAIN_MESSAGE_MAX_CHARS = 160;
 const AUX_FIELD_CHARS_PER_LINE = 28;
 const AUX_FIELD_MAX_LINES = 10;
 const AUX_MESSAGE_CHARS_PER_LINE = 32;
@@ -209,11 +209,10 @@ const styles = StyleSheet.create({
         height: "100%",
         width: "100%",
     },
-    quadrant: {
+    mainPrintArea: {
         height: "50%",
         paddingBottom: 8,
-        paddingRight: 8,
-        width: "50%",
+        width: "100%",
     },
     auxiliaryQuadrant: {
         height: 360,
@@ -561,7 +560,7 @@ export function PedidoPdfDocument({ pedido, statusAtual, entregadorAtual }: Pedi
                 <Page key={`page-${pageIndex}`} size="A4" style={styles.page}>
                     <View style={styles.sheet}>
                         {pageCards.map((card) => (
-                            <View key={card.id} style={styles.quadrant}>
+                            <View key={card.id} style={styles.mainPrintArea}>
                                 <View style={styles.card}>
                                     <View style={styles.header}>
                                         <View>
