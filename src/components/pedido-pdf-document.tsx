@@ -414,12 +414,12 @@ export function PedidoPdfDocument({ pedido, statusAtual, entregadorAtual }: Pedi
     const enderecoCompleto = formatEnderecoCompleto(pedido);
     const fullFieldValues = [
         { label: "Cliente", value: String(pedido.nomeCliente ?? "").trim(), maxChars: FIELD_MAX_CHARS },
-        { label: "Destinatario", value: String(pedido.destinatario ?? "").trim(), maxChars: FIELD_MAX_CHARS },
+        { label: "Destinatário", value: String(pedido.destinatario ?? "").trim(), maxChars: FIELD_MAX_CHARS },
         { label: "Telefone", value: String(pedido.telefone ?? "").trim(), maxChars: FIELD_MAX_CHARS },
-        { label: "Endereco", value: String(enderecoCompleto ?? "").trim(), maxChars: ADDRESS_MAX_CHARS },
+        { label: "Endereço", value: String(enderecoCompleto ?? "").trim(), maxChars: ADDRESS_MAX_CHARS },
         { label: "Complemento", value: String(pedido.endereco?.complemento ?? "").trim(), maxChars: FIELD_MAX_CHARS },
         { label: "Data de entrega", value: String(pedido.endereco?.dataHoraEntrega ?? "").trim(), maxChars: FIELD_MAX_CHARS },
-        { label: "Metodo de pagamento", value: String(pedido.metodoPagamento ?? "").trim(), maxChars: FIELD_MAX_CHARS },
+        { label: "Método de pagamento", value: String(pedido.metodoPagamento ?? "").trim(), maxChars: FIELD_MAX_CHARS },
         { label: "Status", value: String(statusAtual || pedido.status.nome || "").trim(), maxChars: FIELD_MAX_CHARS },
         { label: "Entregador", value: String(entregadorAtual || pedido.entregador || "").trim(), maxChars: FIELD_MAX_CHARS },
     ].filter((campo) => campo.value);

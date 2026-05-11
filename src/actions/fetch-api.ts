@@ -39,15 +39,15 @@ export async function fetchApi(input: RequestInfo | URL, init?: RequestInit) {
         }
 
         const message = response.status >= 500
-            ? "O servico esta indisponivel no momento. Tente novamente em instantes."
-            : "A API retornou um erro ao processar esta operacao.";
+            ? "O serviço está indisponível no momento. Tente novamente em instantes."
+            : "A API retornou um erro ao processar esta operação.";
 
         setApiOffline(message, response.status, errorDetails);
         return response;
     } catch (error) {
         const message = error instanceof Error ? error.message : "Falha desconhecida ao conectar com a API.";
         setApiOffline(
-            "Nao foi possivel conectar com a API. Verifique se ela esta rodando.",
+            "Não foi possível conectar com a API. Verifique se ela está rodando.",
             null,
             message,
         );

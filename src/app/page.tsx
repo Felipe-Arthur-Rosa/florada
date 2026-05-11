@@ -14,10 +14,12 @@ export type Endereco = {
   bairro?: string,
   cidade?: string,
   complemento?: string,
-  dataHoraEntrega?: string
+  dataHoraEntrega?: string,
+  horaPeriodoEntrega?: string
 };
 
 export type Produto = {
+  _id?: string,
   id: number,
   nome: string,
   valor: number,
@@ -29,6 +31,7 @@ export type Status = {
 
 export type Pedido = {
   _id: string,
+  createdAt?: string,
   nomeCliente: string,
   destinatario: string | null,
   mensagem: string,
@@ -41,6 +44,8 @@ export type Pedido = {
   entregador: string | null,
 };
 
+export type PedidoSortMode = "deliveryDate" | "createdAt";
+
 export default function Home() {
   const router = useRouter();
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -48,6 +53,7 @@ export default function Home() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoadingPedidos, setIsLoadingPedidos] = useState(true);
+  const [sortMode, setSortMode] = useState<PedidoSortMode>("deliveryDate");
 
   const recarregarPedidos = () => {
     setIsLoadingPedidos(true);
@@ -108,8 +114,8 @@ export default function Home() {
             </div>
           </div>
         ) : null}
-        <BarraDeBusca pedidos={pedidos} setPedidos={setPedidos} />
-        <Pedidos pedidos={pedidos} isLoading={isLoadingPedidos} SetPedido={setPedido} setIsOpen={setIsOpen} isOpen={isOpen} />
+        <BarraDeBusca pedidos={pedidos} setPedidos={setPedidos} sortMode={sortMode} setSortMode={setSortMode} />
+        <Pedidos pedidos={pedidos} sortMode={sortMode} isLoading={isLoadingPedidos} SetPedido={setPedido} setIsOpen={setIsOpen} isOpen={isOpen} />
         <PedidoModal isOpen={isOpen} pedido={pedido} onPedidoAlterado={() => { recarregarPedidos() }} onClose={() => {setIsOpen(!isOpen);}} />
       </div>
     </ModalProvider>

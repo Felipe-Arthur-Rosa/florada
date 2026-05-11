@@ -14,21 +14,21 @@ export const status: Status[] = [
     nome: "Em produção",
   },
   {
-    nome: "Produto Finalizado",
+    nome: "Produto finalizado",
   },
   {
-    nome: "Saiu para Entrega",
+    nome: "Saiu para entrega",
   },
   {
     nome: "Entregue",
   },
   {
-    nome: "Cancelado pelo Cliente",
+    nome: "Cancelado pelo cliente",
   },
   {
-    nome: "Cancelado por falta de Interação",
+    nome: "Cancelado por falta de interação",
   },
   {
-    nome: "Entrega mal Sucedida",
+    nome: "Entrega mal sucedida",
   },
 ];

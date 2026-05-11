@@ -33,7 +33,7 @@ function getErrorMessage(data: unknown) {
         return data.message;
     }
 
-    return "Nao foi possivel cadastrar o pedido.";
+    return "Não foi possível cadastrar o pedido.";
 }
 
 export default async function pedidoPost(pedido: Pedido) {
@@ -70,7 +70,7 @@ export default async function pedidoPost(pedido: Pedido) {
         return {
             success: false,
             statusCode: null,
-            message: error instanceof Error ? error.message : "Nao foi possivel cadastrar o pedido.",
+            message: error instanceof Error ? error.message : "Não foi possível cadastrar o pedido.",
         } satisfies PedidoPostResult;
     }
 }

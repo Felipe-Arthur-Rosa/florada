@@ -33,7 +33,7 @@ function getErrorMessage(data: unknown) {
     return data.message;
   }
 
-  return "Nao foi possivel editar o pedido.";
+  return "Não foi possível editar o pedido.";
 }
 
 export default async function PedidoPut(pedido: Pedido) {
@@ -69,7 +69,7 @@ export default async function PedidoPut(pedido: Pedido) {
       return {
         success: false,
         statusCode: null,
-        message: error instanceof Error ? error.message : "Nao foi possivel editar o pedido.",
+        message: error instanceof Error ? error.message : "Não foi possível editar o pedido.",
       } satisfies PedidoPutResult;
     }
 }
