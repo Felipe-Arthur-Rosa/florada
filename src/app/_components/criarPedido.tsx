@@ -278,7 +278,7 @@ export function FormPedido() {
                     <Input label="Número" name="numero" type="number" placeholder="Ex: 123" onChange={AlimentaPedido} value={pedido.endereco?.numero ?? ""} />
                     <Input label="Complemento" name="complemento" type="text" placeholder="Apto, bloco, referência" onChange={AlimentaPedido} value={pedido.endereco?.complemento ?? ""} />
                     <Input label="Data de entrega" name="dataHoraEntrega" type="date" onChange={AlimentaPedido} value={pedido.endereco?.dataHoraEntrega?.slice(0, 10) ?? ""} />
-                    <Input label="Hora/período de entrega" name="horaPeriodoEntrega" type="text" placeholder="Ex: Manhã, 10h-12h" onChange={AlimentaPedido} value={pedido.endereco?.horaPeriodoEntrega ?? ""} />
+                    <Input label="Hora/período de entrega" name="horaPeriodoEntrega" type="text" maxLength={50} placeholder="Ex: Manhã, 10h-12h" onChange={AlimentaPedido} value={pedido.endereco?.horaPeriodoEntrega ?? ""} />
                     <Input label="Método de pagamento" name="metodoPagamento" aria-required type="text" placeholder="Pix, cartão, dinheiro..." onChange={AlimentaPedido} value={pedido.metodoPagamento} error={formErrors.metodoPagamento} />
                     <Input label="Valor final" name="valorFinal" readOnly value={pedido.valorFinal ? pedido.valorFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "R$ 0,00"} />
                 </div>

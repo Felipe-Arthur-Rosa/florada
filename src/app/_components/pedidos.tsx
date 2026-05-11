@@ -9,6 +9,7 @@ export type PedidosProps = {
     pedidos: Pedido[];
     sortMode: PedidoSortMode;
     isLoading: boolean;
+    hasActiveFilters: boolean;
     SetPedido: React.Dispatch<React.SetStateAction<Pedido | null>>;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -195,7 +196,7 @@ function parseDeliveryTimeValue(value?: string) {
     return null;
 }
 
-function compareNullableValues(currentValue: number | null, nextValue: number | null) {
+function compareNullableValues(currentValue: number | null, nextValue: number | null, direction: "asc" | "desc" = "asc") {
     if (currentValue === null && nextValue === null) {
         return 0;
     }
@@ -208,15 +209,17 @@ function compareNullableValues(currentValue: number | null, nextValue: number | 
         return -1;
     }
 
-    return currentValue - nextValue;
+    return direction === "asc" ? currentValue - nextValue : nextValue - currentValue;
 }
 
 function sortPedidos(pedidos: Pedido[], sortMode: PedidoSortMode) {
     return [...pedidos].sort((current, next) => {
-        if (sortMode === "deliveryDate") {
+        if (sortMode === "deliveryDateAsc" || sortMode === "deliveryDateDesc") {
+            const direction = sortMode === "deliveryDateAsc" ? "asc" : "desc";
             const dateComparison = compareNullableValues(
                 parseDateValue(current.endereco?.dataHoraEntrega),
-                parseDateValue(next.endereco?.dataHoraEntrega)
+                parseDateValue(next.endereco?.dataHoraEntrega),
+                direction
             );
 
             if (dateComparison !== 0) {
@@ -225,7 +228,8 @@ function sortPedidos(pedidos: Pedido[], sortMode: PedidoSortMode) {
 
             const timeComparison = compareNullableValues(
                 parseDeliveryTimeValue(current.endereco?.horaPeriodoEntrega),
-                parseDeliveryTimeValue(next.endereco?.horaPeriodoEntrega)
+                parseDeliveryTimeValue(next.endereco?.horaPeriodoEntrega),
+                direction
             );
 
             if (timeComparison !== 0) {
@@ -237,7 +241,8 @@ function sortPedidos(pedidos: Pedido[], sortMode: PedidoSortMode) {
 
         const dateComparison = compareNullableValues(
             getPedidoCreatedAtTimestamp(current),
-            getPedidoCreatedAtTimestamp(next)
+            getPedidoCreatedAtTimestamp(next),
+            sortMode === "createdAtDesc" ? "desc" : "asc"
         );
 
         if (dateComparison !== 0) {
@@ -280,7 +285,7 @@ function getStatusBadgeClass(status: string) {
     return "border-status-active/30 bg-status-active/15 text-status-active";
 }
 
-const Pedidos: React.FC<PedidosProps> = ({ pedidos, sortMode, isLoading, SetPedido, setIsOpen, isOpen }) => {
+const Pedidos: React.FC<PedidosProps> = ({ pedidos, sortMode, isLoading, hasActiveFilters, SetPedido, setIsOpen, isOpen }) => {
     const sortedPedidos = useMemo(() => sortPedidos(pedidos, sortMode), [pedidos, sortMode]);
 
     return (
@@ -292,7 +297,7 @@ const Pedidos: React.FC<PedidosProps> = ({ pedidos, sortMode, isLoading, SetPedi
                 </div>
             ) : pedidos.length === 0 ? (
                 <div className="rounded-lg border border-dashed border-border bg-muted p-6 text-center text-muted-foreground">
-                    Nenhum pedido foi criado ainda.
+                    {hasActiveFilters ? "Nenhum pedido encontrado." : "Nenhum pedido foi criado ainda."}
                 </div>
             ) : (
                 <div className="grid grid-cols-1 gap-3 p-1 md:grid-cols-2 xl:grid-cols-3">
