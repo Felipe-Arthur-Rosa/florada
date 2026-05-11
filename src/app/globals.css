@@ -7,6 +7,8 @@
   --foreground: 210 11% 20%;
   --card: 0 0% 100%;
   --card-foreground: 210 11% 20%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 210 11% 20%;
   --primary: 122 39% 49%;
   --primary-foreground: 0 0% 100%;
   --secondary: 120 15% 92%;
@@ -33,6 +35,113 @@
   --sidebar-accent: 240 4.8% 95.9%;
   --sidebar-border: 220 13% 91%;
   --sidebar-ring: 217.2 91.2% 59.8%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: 150 8% 10%;
+    --foreground: 150 10% 92%;
+    --card: 150 8% 13%;
+    --card-foreground: 150 10% 92%;
+    --popover: 150 8% 13%;
+    --popover-foreground: 150 10% 92%;
+    --primary: 122 35% 55%;
+    --primary-foreground: 150 15% 10%;
+    --secondary: 150 8% 18%;
+    --secondary-foreground: 150 10% 92%;
+    --muted: 150 6% 18%;
+    --muted-foreground: 150 8% 65%;
+    --accent: 35 15% 20%;
+    --accent-foreground: 35 25% 88%;
+    --destructive: 0 65% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 150 6% 22%;
+    --input: 150 6% 22%;
+    --ring: 122 35% 55%;
+    --sage: 140 18% 55%;
+    --sage-foreground: 150 10% 92%;
+    --warm: 35 12% 22%;
+    --warm-foreground: 35 25% 88%;
+    --status-active: 122 40% 58%;
+    --status-warning: 40 85% 60%;
+    --status-danger: 0 65% 60%;
+    --sidebar-background: 150 8% 13%;
+    --sidebar-foreground: 150 10% 92%;
+    --sidebar-primary: 122 35% 55%;
+    --sidebar-accent: 150 6% 18%;
+    --sidebar-border: 150 6% 22%;
+    --sidebar-ring: 122 35% 55%;
+  }
+}
+
+:root[data-theme="light"] {
+  --background: 210 20% 96%;
+  --foreground: 210 11% 20%;
+  --card: 0 0% 100%;
+  --card-foreground: 210 11% 20%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 210 11% 20%;
+  --primary: 122 39% 49%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 120 15% 92%;
+  --secondary-foreground: 120 20% 30%;
+  --muted: 210 14% 93%;
+  --muted-foreground: 210 8% 46%;
+  --accent: 40 30% 94%;
+  --accent-foreground: 40 20% 30%;
+  --destructive: 0 65% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 210 14% 89%;
+  --input: 210 14% 89%;
+  --ring: 122 39% 49%;
+  --sage: 140 20% 68%;
+  --sage-foreground: 140 25% 25%;
+  --warm: 35 30% 92%;
+  --warm-foreground: 35 20% 35%;
+  --status-active: 122 39% 49%;
+  --status-warning: 40 90% 55%;
+  --status-danger: 0 65% 55%;
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+}
+
+:root[data-theme="dark"] {
+  --background: 150 8% 10%;
+  --foreground: 150 10% 92%;
+  --card: 150 8% 13%;
+  --card-foreground: 150 10% 92%;
+  --popover: 150 8% 13%;
+  --popover-foreground: 150 10% 92%;
+  --primary: 122 35% 55%;
+  --primary-foreground: 150 15% 10%;
+  --secondary: 150 8% 18%;
+  --secondary-foreground: 150 10% 92%;
+  --muted: 150 6% 18%;
+  --muted-foreground: 150 8% 65%;
+  --accent: 35 15% 20%;
+  --accent-foreground: 35 25% 88%;
+  --destructive: 0 65% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 150 6% 22%;
+  --input: 150 6% 22%;
+  --ring: 122 35% 55%;
+  --sage: 140 18% 55%;
+  --sage-foreground: 150 10% 92%;
+  --warm: 35 12% 22%;
+  --warm-foreground: 35 25% 88%;
+  --status-active: 122 40% 58%;
+  --status-warning: 40 85% 60%;
+  --status-danger: 0 65% 60%;
+  --sidebar-background: 150 8% 13%;
+  --sidebar-foreground: 150 10% 92%;
+  --sidebar-primary: 122 35% 55%;
+  --sidebar-accent: 150 6% 18%;
+  --sidebar-border: 150 6% 22%;
+  --sidebar-ring: 122 35% 55%;
 }
 
 @layer base {
@@ -68,4 +177,25 @@ select,
 textarea,
 button {
   min-width: 0;
+}
+
+input,
+select,
+textarea {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: hsl(var(--muted-foreground));
+  opacity: 1;
+}
+
+input:disabled,
+input:read-only,
+textarea:disabled,
+select:disabled {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
 }

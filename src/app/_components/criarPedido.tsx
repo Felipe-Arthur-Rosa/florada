@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import PedidoPut from "../../actions/pedido-put";
 import GetPedidoById from "../../actions/pedido-get-by-id";
+import CustomSelect from "./customSelect";
 
 type FormErrors = {
     nomeCliente?: string;
@@ -24,18 +25,9 @@ const MAX_PRODUCT_VALUE = 1_000_000_000_000;
 function formatPhoneNumber(value: string) {
     const digits = value.replace(/\D/g, "").slice(0, 11);
 
-    if (digits.length <= 2) {
-        return digits;
-    }
-
-    if (digits.length <= 6) {
-        return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-    }
-
-    if (digits.length <= 10) {
-        return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
-    }
-
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 }
 
@@ -58,27 +50,12 @@ function validatePedido(pedido: Pedido): FormErrors {
     const errors: FormErrors = {};
     const phoneDigits = pedido.telefone.replace(/\D/g, "");
 
-    if (!pedido.nomeCliente.trim()) {
-        errors.nomeCliente = "Informe o nome do cliente.";
-    }
-
-    if (!phoneDigits) {
-        errors.telefone = "Informe o telefone.";
-    } else if (phoneDigits.length < 10) {
-        errors.telefone = "Informe um telefone valido com DDD.";
-    }
-
-    if (!pedido.status.nome.trim()) {
-        errors.status = "Selecione um status.";
-    }
-
-    if (!pedido.metodoPagamento.trim()) {
-        errors.metodoPagamento = "Informe o metodo de pagamento.";
-    }
-
-    if (pedido.produtos.length === 0 || pedido.valorFinal <= 0) {
-        errors.produtos = "Adicione pelo menos um produto com valor valido.";
-    }
+    if (!pedido.nomeCliente.trim()) errors.nomeCliente = "Informe o nome do cliente.";
+    if (!phoneDigits) errors.telefone = "Informe o telefone.";
+    else if (phoneDigits.length < 10) errors.telefone = "Informe um telefone válido com DDD.";
+    if (!pedido.status.nome.trim()) errors.status = "Selecione um status.";
+    if (!pedido.metodoPagamento.trim()) errors.metodoPagamento = "Informe o método de pagamento.";
+    if (pedido.produtos.length === 0 || pedido.valorFinal <= 0) errors.produtos = "Adicione pelo menos um produto com valor válido.";
 
     return errors;
 }
@@ -96,13 +73,14 @@ function createEmptyPedido(): Pedido {
             bairro: "",
             cidade: "",
             complemento: "",
-            dataHoraEntrega: ""
+            dataHoraEntrega: "",
+            horaPeriodoEntrega: "",
         },
         metodoPagamento: "",
         produtos: [],
         valorFinal: 0,
         status: { nome: "" },
-        entregador: ""
+        entregador: "",
     };
 }
 
@@ -129,16 +107,13 @@ export function FormPedido() {
     const [formErrors, setFormErrors] = useState<FormErrors>({});
     const [produtoInput, setProdutoInput] = useState("");
     const [valorProdutoInput, setValorProdutoInput] = useState("");
-
     const [pedido, setPedido] = useState<Pedido>(createEmptyPedido());
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const pedidoId = params.get("pedidoId");
 
-        if (!pedidoId) {
-            return;
-        }
+        if (!pedidoId) return;
 
         setIsEditMode(true);
         setIsLoadingPedido(true);
@@ -147,7 +122,7 @@ export function FormPedido() {
             .then((pedidoEncontrado) => {
                 if (!pedidoEncontrado) {
                     setSubmitError(true);
-                    setSubmitMessage("Nao foi possivel carregar o pedido para edicao.");
+                    setSubmitMessage("Não foi possível carregar o pedido para edição.");
                     return;
                 }
 
@@ -170,7 +145,7 @@ export function FormPedido() {
         if (valorNumerico > MAX_PRODUCT_VALUE) {
             setFormErrors((prev) => ({
                 ...prev,
-                produtos: "O valor maximo por produto e R$ 1.000.000.000.000,00.",
+                produtos: "O valor máximo por produto é R$ 1.000.000.000.000,00.",
             }));
             return;
         }
@@ -182,7 +157,7 @@ export function FormPedido() {
         const novoProduto = {
             id: proximoId,
             nome: produtoInput.trim(),
-            valor: valorNumerico
+            valor: valorNumerico,
         };
 
         setPedido((prev) => {
@@ -192,7 +167,7 @@ export function FormPedido() {
             return {
                 ...prev,
                 produtos: novosProdutos,
-                valorFinal: novoValorFinal
+                valorFinal: novoValorFinal,
             };
         });
 
@@ -201,7 +176,7 @@ export function FormPedido() {
         setFormErrors((prev) => ({ ...prev, produtos: undefined }));
     }
 
-function AlimentaPedido(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    function AlimentaPedido(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
         const { name, value: rawValue } = e.target;
         const value =
             name === "telefone"
@@ -214,23 +189,21 @@ function AlimentaPedido(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElemen
             if (name === "status") {
                 return {
                     ...prev,
-                    status: { nome: rawValue }
+                    status: { nome: rawValue },
                 };
             }
 
-            if (["rua", "numero", "bairro", "cidade", "complemento", "dataHoraEntrega"].includes(name)) {
-                if (!prev.endereco) {
-                    return prev;
-                }
+            if (["rua", "numero", "bairro", "cidade", "complemento", "dataHoraEntrega", "horaPeriodoEntrega"].includes(name)) {
+                if (!prev.endereco) return prev;
                 return {
                     ...prev,
-                    endereco: { ...prev.endereco, [name]: value }
+                    endereco: { ...prev.endereco, [name]: value },
                 };
             }
 
             return {
                 ...prev,
-                [name]: value
+                [name]: value,
             };
         });
 
@@ -239,6 +212,13 @@ function AlimentaPedido(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElemen
         }
     }
 
+    function AlimentaStatus(value: string) {
+        setPedido((prev) => ({
+            ...prev,
+            status: { nome: value },
+        }));
+        setFormErrors((prev) => ({ ...prev, status: undefined }));
+    }
 
     async function CriaPedido(e: React.FormEvent) {
         e.preventDefault();
@@ -247,7 +227,7 @@ function AlimentaPedido(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElemen
         if (Object.keys(validationErrors).length > 0) {
             setFormErrors(validationErrors);
             setSubmitError(true);
-            setSubmitMessage("Revise os campos obrigatorios antes de enviar.");
+            setSubmitMessage("Revise os campos obrigatórios antes de enviar.");
             return;
         }
 
@@ -270,89 +250,112 @@ function AlimentaPedido(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElemen
     }
 
     return (
-        <div className="mx-auto mt-4 grid w-full max-w-7xl grid-cols-1 gap-4 px-4 pb-6 sm:px-6 lg:grid-cols-2 lg:px-8">
-            <form onSubmit={CriaPedido} className="flex flex-col rounded-lg border border-border bg-card p-4 shadow-md">
-                <h1 className="mb-4 text-xl font-semibold">{isEditMode ? "Editar Pedido" : "Criar Pedido"}</h1>
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:px-8">
+            <form onSubmit={CriaPedido} className="rounded-lg border border-border bg-card p-5 shadow-md sm:p-8">
+                <div className="mb-6 flex items-center justify-between gap-3">
+                    <h1 className="text-xl font-semibold">{isEditMode ? "Editar pedido" : "Criar pedido"}</h1>
+                </div>
+
                 {submitMessage ? (
                     <div className={`mb-4 rounded-lg border p-3 text-sm ${submitError ? "border-destructive/30 bg-destructive/10 text-destructive" : "border-status-active/30 bg-secondary text-secondary-foreground"}`}>
                         {submitMessage}
                     </div>
                 ) : null}
+
                 {isLoadingPedido ? (
-                    <div className="rounded-lg border border-border bg-muted p-4 text-sm text-muted-foreground">
-                        Carregando pedido para edicao...
+                    <div className="mb-4 rounded-lg border border-border bg-muted p-4 text-sm text-muted-foreground">
+                        Carregando pedido para edição...
                     </div>
                 ) : null}
-                <Input label="Nome do Cliente" name="nomeCliente" aria-required type="text" onChange={AlimentaPedido} value={pedido.nomeCliente} error={formErrors.nomeCliente} />
-                <Input label="Destinatario" name="destinatario" type="text" onChange={AlimentaPedido} value={pedido.destinatario ?? ""} />
-                <Input label="Telefone" name="telefone" aria-required type="tel" onChange={AlimentaPedido} value={pedido.telefone} error={formErrors.telefone} />
-                <Input label="Bairro" name="bairro" type="text" onChange={AlimentaPedido} value={pedido.endereco?.bairro ?? ""} />
-                <Input label="Rua" name="rua" type="text" onChange={AlimentaPedido} value={pedido.endereco?.rua ?? ""} />
-                <Input label="Número" name="numero" type="number" onChange={AlimentaPedido} value={pedido.endereco?.numero ?? ""} />
-                <Input label="Cidade" name="cidade" type="text" onChange={AlimentaPedido} value={pedido.endereco?.cidade ?? ""} />
-                <Input label="Complemento" name="complemento" type="text" onChange={AlimentaPedido} value={pedido.endereco?.complemento ?? ""} />
-                <Input label="Data de entrega" name="dataHoraEntrega" type="text" onChange={AlimentaPedido} value={pedido.endereco?.dataHoraEntrega ?? ""} />
-                <Input label="Mensagem do cartão" name="mensagem" type="text" onChange={AlimentaPedido} value={pedido.mensagem} />
-                <Input label="Metodo de Pagamento" name="metodoPagamento" aria-required type="text" onChange={AlimentaPedido} value={pedido.metodoPagamento} error={formErrors.metodoPagamento} />
 
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <Input
-                        label="Produto"
-                        name="produto"
-                        type="text"
-                        aria-required
-                        value={produtoInput}
-                        onChange={(e) => {
-                            setProdutoInput(e.target.value);
-                            setFormErrors((prev) => ({ ...prev, produtos: undefined }));
-                        }}
+                <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
+                    <Input label="Nome do cliente" name="nomeCliente" aria-required type="text" placeholder="Ex: Maria Silva" onChange={AlimentaPedido} value={pedido.nomeCliente} error={formErrors.nomeCliente} />
+                    <Input label="Destinatário" name="destinatario" type="text" placeholder="Quem recebe" onChange={AlimentaPedido} value={pedido.destinatario ?? ""} />
+                    <Input label="Telefone" name="telefone" aria-required type="tel" placeholder="(11) 99999-9999" onChange={AlimentaPedido} value={pedido.telefone} error={formErrors.telefone} />
+                    <Input label="Cidade" name="cidade" type="text" placeholder="Ex: São Paulo" onChange={AlimentaPedido} value={pedido.endereco?.cidade ?? ""} />
+                    <Input label="Bairro" name="bairro" type="text" placeholder="Ex: Jardins" onChange={AlimentaPedido} value={pedido.endereco?.bairro ?? ""} />
+                    <Input label="Rua" name="rua" type="text" placeholder="Nome da rua" onChange={AlimentaPedido} value={pedido.endereco?.rua ?? ""} />
+                    <Input label="Número" name="numero" type="number" placeholder="Ex: 123" onChange={AlimentaPedido} value={pedido.endereco?.numero ?? ""} />
+                    <Input label="Complemento" name="complemento" type="text" placeholder="Apto, bloco, referência" onChange={AlimentaPedido} value={pedido.endereco?.complemento ?? ""} />
+                    <Input label="Data de entrega" name="dataHoraEntrega" type="date" onChange={AlimentaPedido} value={pedido.endereco?.dataHoraEntrega?.slice(0, 10) ?? ""} />
+                    <Input label="Hora/período de entrega" name="horaPeriodoEntrega" type="text" maxLength={50} placeholder="Ex: Manhã, 10h-12h" onChange={AlimentaPedido} value={pedido.endereco?.horaPeriodoEntrega ?? ""} />
+                    <Input label="Método de pagamento" name="metodoPagamento" aria-required type="text" placeholder="Pix, cartão, dinheiro..." onChange={AlimentaPedido} value={pedido.metodoPagamento} error={formErrors.metodoPagamento} />
+                    <Input label="Valor final" name="valorFinal" readOnly value={pedido.valorFinal ? pedido.valorFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "R$ 0,00"} />
+                </div>
+
+                <div className="mt-4">
+                    <label className="mb-2 block text-sm font-semibold" htmlFor="mensagem">Mensagem do cartão</label>
+                    <textarea
+                        id="mensagem"
+                        name="mensagem"
+                        placeholder="Mensagem que acompanha o pedido..."
+                        className="min-h-24 w-full resize-y rounded-lg border border-input bg-background px-3 py-3 text-base text-foreground shadow-sm outline-none transition placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                        onChange={AlimentaPedido}
+                        value={pedido.mensagem}
                     />
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+                </div>
+
+                <div className="mt-4 max-w-md">
+                    <CustomSelect
+                        id="status"
+                        label="Status"
+                        required
+                        value={pedido.status.nome}
+                        placeholder="Selecione"
+                        error={formErrors.status}
+                        options={status.map((status) => ({
+                            label: status.nome,
+                            value: status.nome,
+                        }))}
+                        onChange={AlimentaStatus}
+                    />
+                </div>
+
+                <section className="mt-7">
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                        <h2 className="text-base font-semibold">Produtos</h2>
+                        <button type="button" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-input bg-background px-4 text-sm font-semibold text-muted-foreground shadow-sm transition hover:bg-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring" onClick={AlimentaProdutos}>
+                            <span className="text-lg leading-none">+</span>
+                            Adicionar
+                        </button>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_140px]">
+                        <Input
+                            label="Produto"
+                            name="produto"
+                            type="text"
+                            aria-required
+                            placeholder="Produto"
+                            value={produtoInput}
+                            onChange={(e) => {
+                                setProdutoInput(e.target.value);
+                                setFormErrors((prev) => ({ ...prev, produtos: undefined }));
+                            }}
+                        />
                         <Input
                             label="Valor"
                             name="valor"
                             type="text"
                             inputMode="numeric"
+                            placeholder="R$ 0,00"
                             value={valorProdutoInput}
                             onChange={(e) => {
                                 setValorProdutoInput(formatCurrencyInput(e.target.value));
                                 setFormErrors((prev) => ({ ...prev, produtos: undefined }));
                             }}
                         />
-                        <button type="button" className="h-12 w-full rounded bg-primary font-bold text-primary-foreground transition hover:bg-primary/90 sm:w-12" onClick={AlimentaProdutos}>+</button>
                     </div>
-                </div>
-                {formErrors.produtos ? <span className="mb-2 text-sm text-destructive">{formErrors.produtos}</span> : null}
+                    {formErrors.produtos ? <span className="text-sm text-destructive">{formErrors.produtos}</span> : null}
+                </section>
 
-                <Input
-                    label="Valor final"
-                    name="valorFinal"
-                    readOnly
-                    value={pedido.valorFinal ? pedido.valorFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : ""}
-                />
-                
-                <h1 className="text-sm font-semibold">Status <span className="text-destructive">*</span></h1>
-                <select
-                    name="status"
-                    onChange={AlimentaPedido}
-                    value={pedido.status.nome}
-                    className={`w-full cursor-pointer rounded-lg border bg-card p-2 text-sm shadow-sm ${formErrors.status ? "border-destructive" : "border-input"}`}
-                >
-                    <option value="">Status</option>
-                    {status.map((status, index) => (
-                        <option key={index} value={status.nome}>{status.nome}</option>
-                    ))}
-                </select>
-                {formErrors.status ? <span className="mt-1 text-sm text-destructive">{formErrors.status}</span> : null}
-                
-                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-7">
-                    <Link className="rounded bg-muted px-4 py-2 text-center font-bold text-muted-foreground transition hover:bg-accent hover:text-accent-foreground" href={'/'}>Cancelar</Link>
-                    <button className="rounded bg-primary px-4 py-2 font-bold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-primary/40" disabled={isSubmitting} type="submit">
-                        {isSubmitting ? (isEditMode ? "Salvando..." : "Criando...") : (isEditMode ? "Salvar Edicao" : "Criar Pedido")}
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                    <Link className="flex h-12 items-center justify-center rounded-lg border border-border bg-card px-5 text-center font-bold text-muted-foreground transition hover:bg-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring" href={'/'}>Cancelar</Link>
+                    <button className="h-12 rounded-lg bg-primary px-5 font-bold text-primary-foreground transition hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:bg-primary/40" disabled={isSubmitting} type="submit">
+                        {isSubmitting ? (isEditMode ? "Salvando..." : "Criando...") : (isEditMode ? "Salvar edição" : "Salvar pedido")}
                     </button>
                 </div>
-
             </form>
+
             <ResumoPedido pedido={pedido} setPedido={setPedido} />
         </div>
     );

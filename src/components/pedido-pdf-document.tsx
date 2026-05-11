@@ -78,6 +78,51 @@ function formatCurrency(value: number) {
     });
 }
 
+function formatDeliveryDate(value?: string | null) {
+    const text = String(value ?? "").trim();
+
+    if (!text) {
+        return "";
+    }
+
+    const isoDateMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (isoDateMatch) {
+        const [, year, month, day] = isoDateMatch;
+        return `${day}/${month}/${year}`;
+    }
+
+    const brDateMatch = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+
+    if (brDateMatch) {
+        const [, day, month, year] = brDateMatch;
+        return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+    }
+
+    const timestamp = new Date(text.includes(" ") ? text.replace(" ", "T") : text).getTime();
+
+    if (Number.isNaN(timestamp)) {
+        return text;
+    }
+
+    return new Intl.DateTimeFormat("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    }).format(new Date(timestamp));
+}
+
+function formatDeliveryDateWithPeriod(dateValue?: string | null, periodValue?: string | null) {
+    const date = formatDeliveryDate(dateValue);
+    const period = String(periodValue ?? "").trim();
+
+    if (date && period) {
+        return `${date} - ${period}`;
+    }
+
+    return date || period;
+}
+
 function truncateText(value: string, maxChars: number) {
     const normalizedValue = value.replace(/\s+/g, " ").trim();
 
@@ -414,12 +459,12 @@ export function PedidoPdfDocument({ pedido, statusAtual, entregadorAtual }: Pedi
     const enderecoCompleto = formatEnderecoCompleto(pedido);
     const fullFieldValues = [
         { label: "Cliente", value: String(pedido.nomeCliente ?? "").trim(), maxChars: FIELD_MAX_CHARS },
-        { label: "Destinatario", value: String(pedido.destinatario ?? "").trim(), maxChars: FIELD_MAX_CHARS },
+        { label: "Destinatário", value: String(pedido.destinatario ?? "").trim(), maxChars: FIELD_MAX_CHARS },
         { label: "Telefone", value: String(pedido.telefone ?? "").trim(), maxChars: FIELD_MAX_CHARS },
-        { label: "Endereco", value: String(enderecoCompleto ?? "").trim(), maxChars: ADDRESS_MAX_CHARS },
+        { label: "Endereço", value: String(enderecoCompleto ?? "").trim(), maxChars: ADDRESS_MAX_CHARS },
         { label: "Complemento", value: String(pedido.endereco?.complemento ?? "").trim(), maxChars: FIELD_MAX_CHARS },
-        { label: "Data de entrega", value: String(pedido.endereco?.dataHoraEntrega ?? "").trim(), maxChars: FIELD_MAX_CHARS },
-        { label: "Metodo de pagamento", value: String(pedido.metodoPagamento ?? "").trim(), maxChars: FIELD_MAX_CHARS },
+        { label: "Data de entrega", value: formatDeliveryDateWithPeriod(pedido.endereco?.dataHoraEntrega, pedido.endereco?.horaPeriodoEntrega), maxChars: FIELD_MAX_CHARS },
+        { label: "Método de pagamento", value: String(pedido.metodoPagamento ?? "").trim(), maxChars: FIELD_MAX_CHARS },
         { label: "Status", value: String(statusAtual || pedido.status.nome || "").trim(), maxChars: FIELD_MAX_CHARS },
         { label: "Entregador", value: String(entregadorAtual || pedido.entregador || "").trim(), maxChars: FIELD_MAX_CHARS },
     ].filter((campo) => campo.value);

@@ -4,8 +4,8 @@ import ApiStatusPopup from "@/components/apiStatusPopup";
 import SiteHeader from "@/components/siteHeader";
 
 export const metadata: Metadata = {
-  title: "Florada API",
-  description: "Automações florada",
+  title: "Florada",
+  description: "Gestão de pedidos da Florada",
 };
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="">
+    <html lang="pt-BR" className="">
       <body>
           <ApiStatusPopup />
           <SiteHeader />

@@ -1,69 +1,96 @@
 import { useState } from "react";
-import { Pedido } from "../page";
+import { Pedido, PedidoSortMode } from "../page";
 import GetPedidos from "../../actions/pedido-get";
 import { status } from "../../actions/status-get";
+import CustomSelect from "./customSelect";
 
 export type PedidosProps = {
     pedidos: Pedido[];
     setPedidos: React.Dispatch<React.SetStateAction<Pedido[]>>;
+    sortMode: PedidoSortMode;
+    setSortMode: React.Dispatch<React.SetStateAction<PedidoSortMode>>;
+    setHasActiveFilters: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const filtro = (
-    setSearch: React.Dispatch<React.SetStateAction<string>>,
-    setPedidos: React.Dispatch<React.SetStateAction<Pedido[]>>
-) => {
-    return function () {
-        GetPedidos().then((pedidos) => {
-            const busca = (document.querySelector('input[type="text"]') as HTMLInputElement)?.value || "";
-            const status = (document.querySelector('select') as HTMLSelectElement)?.value || "";
+function filtrarPedidos(setPedidos: React.Dispatch<React.SetStateAction<Pedido[]>>, busca: string, statusSelecionado: string) {
+    GetPedidos().then((pedidos) => {
+        setPedidos(
+            pedidos.filter((pedido: Pedido) => {
+                const rua = String(pedido.endereco?.rua ?? "").toLowerCase();
+                const bairro = String(pedido.endereco?.bairro ?? "").toLowerCase();
+                const buscaNormalizada = busca.toLowerCase();
 
-            setSearch(busca);
+                const atendeBusca =
+                    busca === "" ||
+                    pedido.nomeCliente.toLowerCase().includes(buscaNormalizada) ||
+                    pedido.telefone.includes(busca) ||
+                    rua.includes(buscaNormalizada) ||
+                    bairro.includes(buscaNormalizada);
 
-            setPedidos(
-                pedidos.filter((pedido: Pedido) => {
-                    const rua = String(pedido.endereco?.rua ?? "").toLowerCase();
-                    const bairro = String(pedido.endereco?.bairro ?? "").toLowerCase();
-                    const buscaNormalizada = busca.toLowerCase();
+                const atendeStatus = statusSelecionado === "" || pedido.status.nome === statusSelecionado;
 
-                    const atendeBusca =
-                        busca === "" ||
-                        pedido.nomeCliente.toLowerCase().includes(buscaNormalizada) ||
-                        pedido.telefone.includes(busca) ||
-                        rua.includes(buscaNormalizada) ||
-                        bairro.includes(buscaNormalizada);
+                return atendeBusca && atendeStatus;
+            })
+        );
+    });
+}
 
-                    const atendeStatus = status === "" || pedido.status.nome === status;
+const sortOptions: { label: string; value: PedidoSortMode }[] = [
+    { label: "Criação: mais recente", value: "createdAtDesc" },
+    { label: "Criação: mais antigo", value: "createdAtAsc" },
+    { label: "Entrega: mais próxima", value: "deliveryDateAsc" },
+    { label: "Entrega: mais distante", value: "deliveryDateDesc" },
+];
 
-                    return atendeBusca && atendeStatus;
-                })
-            );
-        });
-    };
-};
-
-const BarraDeBusca: React.FC<PedidosProps> = ({ pedidos, setPedidos}) => {
-
+const BarraDeBusca: React.FC<PedidosProps> = ({ setPedidos, sortMode, setSortMode, setHasActiveFilters }) => {
     const [search, setSearch] = useState<string>("");
+    const [statusSelecionado, setStatusSelecionado] = useState<string>("");
 
     return (
-        <div className="mb-4 mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:items-center">
+        <div className="mb-4 mt-4 grid grid-cols-2 items-center gap-2 sm:mt-5 md:flex md:flex-row md:flex-nowrap md:gap-3">
             <input
                 type="text"
                 placeholder="Buscar"
-                className="w-full rounded-lg border border-input bg-card p-2 shadow-sm sm:flex-1"
-                onChange={filtro(setSearch, setPedidos)}
+                aria-label="Buscar pedidos"
+                className="col-span-2 h-12 min-w-0 rounded-lg border border-input bg-card px-3 text-base shadow-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring md:flex-[1_1_calc(100%-22rem)]"
+                value={search}
+                onChange={(event) => {
+                    const busca = event.target.value;
+                    setSearch(busca);
+                    setHasActiveFilters(busca.trim() !== "" || statusSelecionado !== "");
+                    filtrarPedidos(setPedidos, busca, statusSelecionado);
+                }}
             />
-            <select
-                className="w-full rounded-lg border border-input bg-card p-2 text-sm shadow-sm sm:w-auto sm:min-w-48"
-                onChange={filtro(setSearch, setPedidos)}
-            >
-                <option value="">Status</option>
-                {status.map((status, index) => (
-                    <option key={index} value={status.nome}>{status.nome}</option>
-                ))}
-            </select>
+            <div className="min-w-0 md:w-44 md:shrink-0">
+                <CustomSelect
+                    id="filtro-status"
+                    label="Status"
+                    hideLabel
+                    value={statusSelecionado}
+                    placeholder="Status"
+                    options={[
+                        { label: "Todos", value: "" },
+                        ...status.map((status) => ({ label: status.nome, value: status.nome })),
+                    ]}
+                    onChange={(value) => {
+                        setStatusSelecionado(value);
+                        setHasActiveFilters(search.trim() !== "" || value !== "");
+                        filtrarPedidos(setPedidos, search, value);
+                    }}
+                />
+            </div>
+            <div className="min-w-0 md:w-56 md:shrink-0">
+                <CustomSelect
+                    id="ordenar-pedidos"
+                    label="Ordenar pedidos"
+                    hideLabel
+                    value={sortMode}
+                    options={sortOptions}
+                    onChange={(value) => setSortMode(value as PedidoSortMode)}
+                />
+            </div>
         </div>
     );
-}
+};
 
 export { BarraDeBusca };
